@@ -1,0 +1,23 @@
+@import "../variables";
+
+.product {
+    padding: 30px 50px;
+    border-bottom: 2px solid $gold;
+    height: fit-content;
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    column-gap: 50px;
+    align-items: center;
+    &-title {
+        color: $white;
+        font-size: 25px;
+    }
+    &-link {
+        color: $white;
+        font-size: 25px;
+        transition: all .3s;
+        &:hover {
+            color: $gold;
+        }
+    }
+}

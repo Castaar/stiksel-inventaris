@@ -3,14 +3,18 @@ import React from "react";
 // DB connect
 import clientPromise from "../lib/mongodb";
 
+import Title from "../components/base/title";
 import Category from "../components/blocks/category";
 
 export default function categories(props) {
   return (
     <main className="main">
-      {props.collections.map((collection, index) => {
-        return <Category key={index} title={collection.name} />;
-      })}
+      <Title value={"Categorieën"} url={"/"} />
+      <div className="main-list">
+        {props.collections.map((collection, index) => {
+          return <Category key={index} title={collection.name} />;
+        })}
+      </div>
     </main>
   );
 }

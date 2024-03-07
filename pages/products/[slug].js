@@ -1,17 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 
 // DB connect
 import clientPromise from "../../lib/mongodb";
 
-// import Category from "../../components/blocks/category";
+import Title from "../../components/base/title";
+import CategoryTitle from "../../components/blocks/category-title";
+import Search from "../../components/base/search";
+import Product from "../../components/blocks/product";
 
 export default function category(props) {
-  console.log(props);
+  const [searchInput, setSearchInput] = useState();
+
   return (
     <main className="main">
-      {props.products.map((product, index) => {
-        return <p>{product.name}</p>;
-      })}
+      <div>
+        <Title value={"Producten"} url={"/categories"} />
+        <div className="main-heading">
+          <CategoryTitle />
+          <Search setSearchInput={setSearchInput} />
+        </div>
+      </div>
+      <div>
+        <Product
+          name={"Omschrijving:"}
+          format={"Formaat:"}
+          number={"Productnummer:"}
+          available={"Aantal m beschikbaar:"}
+          edit={false}
+        />
+        {props.products
+          .filter((product) => {
+            let productName = product.name.toLowerCase();
+            if (searchInput) {
+              if (productName.includes(searchInput.toLowerCase())) {
+                return product;
+              } else {
+                return "";
+              }
+            } else {
+              return product;
+            }
+          })
+          .map((product, index) => {
+            return <Product key={index} {...product} edit={true} />;
+          })}
+      </div>
     </main>
   );
 }

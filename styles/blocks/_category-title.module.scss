@@ -1,0 +1,28 @@
+@import "../variables";
+
+.category {
+    padding: 30px 50px;
+    border-bottom: 2px solid $gold;
+    &-title {
+        color: $white;
+        font-size: 30px;
+        font-weight: 900;
+        text-transform: uppercase;
+        transition: all .3s;
+    }
+    &-search {
+        color: $white;
+        font-size: 30px;
+        font-weight: 900;
+        text-transform: uppercase;
+        transition: all .3s;
+        outline: none;
+        border: none;
+        background: none;
+        font-family: $font-body;
+        &::placeholder {
+            color: $white;
+            font-weight: 900;
+        }
+    }
+}

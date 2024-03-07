@@ -8,6 +8,7 @@
     flex-direction: column;
     align-items: center;
     &-value {
+        color: $black;
         font-size: 135px;
         font-weight: 900;
         -webkit-text-stroke-width: 2px;
