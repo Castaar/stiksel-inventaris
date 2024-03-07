@@ -1,0 +1,12 @@
+@import "../variables";
+
+.category {
+    padding: 30px 50px;
+    border-bottom: 2px solid $gold;
+    &-title {
+        color: $white;
+        font-size: 30px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+}
