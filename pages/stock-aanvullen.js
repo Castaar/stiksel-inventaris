@@ -7,6 +7,7 @@ import clientPromise from "../lib/mongodb";
 import Title from "../components/base/title";
 import Search from "../components/base/search";
 import Dropdown from "../components/base/dropdown";
+import DropdownProducts from "../components/base/dropdown-products";
 import Product from "../components/blocks/select-product";
 
 import styles from "../styles/blocks/_category-title.module.scss";
@@ -14,9 +15,7 @@ import styles from "../styles/blocks/_category-title.module.scss";
 export default function categories(props) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
-  const [stockInput, setStockInput] = useState({
-    name: router.query?.product,
-  });
+  const [stockInput, setStockInput] = useState({});
 
   let productsResult;
   props.products.filter((product) => {
@@ -38,26 +37,31 @@ export default function categories(props) {
         <Title value={"Stock aanvullen"} url={"/stock"} />
         <div className="main-heading">
           <Dropdown collections={props.collections} />
-          <Search
+          {router.query?.collection && (
+            <DropdownProducts collections={props.products} />
+          )}
+          {/* <Search
             setSearchInput={setSearchInput}
             productSearchInfo={productsResult}
-          />
+          /> */}
         </div>
       </div>
       <div className="main-list-stock">
-        <div className={styles["category"]}>
-          <input
-            className={styles["category-search"]}
-            placeholder="Omschrijving"
-            onChange={(e) =>
-              setStockInput((stockInput) => ({
-                ...stockInput,
-                format: e.target.value,
-              }))
-            }
-            defaultValue={stockInput.name}
-          />
-        </div>
+        {router.query?.state === "new" && (
+          <div className={styles["category"]}>
+            <input
+              className={styles["category-search"]}
+              placeholder="Omschrijving"
+              onChange={(e) =>
+                setStockInput((stockInput) => ({
+                  ...stockInput,
+                  format: e.target.value,
+                }))
+              }
+              defaultValue={stockInput.name}
+            />
+          </div>
+        )}
         <div className={styles["category"]}>
           <input
             className={styles["category-search"]}
@@ -73,7 +77,8 @@ export default function categories(props) {
         <div className={styles["category"]}>
           <input
             className={styles["category-search"]}
-            placeholder="Aantal stuks"
+            placeholder="Aantal m / stuks"
+            type="number"
             onChange={(e) =>
               setStockInput((stockInput) => ({
                 ...stockInput,
@@ -82,6 +87,35 @@ export default function categories(props) {
             }
           />
         </div>
+        <div className={styles["category"]}>
+          <input
+            className={styles["category-search"]}
+            placeholder="Nummer"
+            type="number"
+            onChange={(e) =>
+              setStockInput((stockInput) => ({
+                ...stockInput,
+                number: Number(e.target.value),
+              }))
+            }
+          />
+        </div>
+        <div className={styles["category"]}>
+          <input
+            className={styles["category-search"]}
+            placeholder="Prijs"
+            type="number"
+            onChange={(e) =>
+              setStockInput((stockInput) => ({
+                ...stockInput,
+                price: Number(e.target.value),
+              }))
+            }
+          />
+        </div>
+      </div>
+      <div className="btn-wrapper">
+        <button className="btn">Bewaar</button>
       </div>
     </main>
   );
@@ -112,8 +146,6 @@ export async function getServerSideProps({ query }) {
         }
       }
     }
-
-    console.log(allItems);
 
     return {
       props: {

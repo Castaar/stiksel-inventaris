@@ -1,7 +1,15 @@
 import Head from "next/head";
 import "../styles/globals.scss";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function myApp({ Component, pageProps }) {
+  const [navActive, setNavActive] = useState(false);
+
+  const handleToggleNav = () => {
+    setNavActive(!navActive);
+  };
+
   return (
     <>
       <Head>
@@ -33,7 +41,7 @@ export default function myApp({ Component, pageProps }) {
       </Head>
       <header className="header">
         <a href="/">Castaar</a>
-        <span>
+        <span onClick={handleToggleNav}>
           <svg
             id="icon_menu"
             xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +59,14 @@ export default function myApp({ Component, pageProps }) {
           </svg>
         </span>
       </header>
-      <nav className="navigation">{/* <Link></Link> */}</nav>
+      {navActive && (
+        <nav className="navigation">
+          <Link href="/">Home</Link>
+          <Link href="/order-plaatsen">Order plaatsen</Link>
+          <Link href="/stock">Stock</Link>
+          <Link href="/stock-aanvullen">Stock aanvullen</Link>
+        </nav>
+      )}
       <Component {...pageProps} />
     </>
   );

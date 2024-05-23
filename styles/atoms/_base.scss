@@ -50,15 +50,20 @@ a {
   display: flex;
   justify-content: space-between;
   z-index: 999;
+  position: fixed;
+  width: 100%;
   a {
     font-size: 45px;
     font-weight: 900;
     color: $gold;
     text-transform: uppercase;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
   }
   span {
     display: flex;
     align-items: center;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    cursor: pointer;
     svg {
       color: $gold;
       aspect-ratio: 1;
@@ -69,7 +74,7 @@ a {
 }
 
 .navigation {
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 0;
   padding: 0 60px;
@@ -78,4 +83,35 @@ a {
   z-index: 998;
   max-width: 375px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  background-color: $black;
+  gap: 20px;
+  a {
+    color: $white;
+    font-size: 30px;
+    font-weight: 900;
+    text-transform: uppercase;
+    transition: all .3s;
+    &:hover {
+      color: $gold;
+    }
+  }
+}
+
+.btn {
+  background: none;
+  border: none;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: $gold;
+  font-size: 30px;
+  font-family: $font-body;
+  cursor: pointer;
+  &-wrapper {
+    margin-top: 50px;
+    padding: 0 50px;
+  }
 }

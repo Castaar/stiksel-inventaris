@@ -13,15 +13,6 @@ const search = ({ setSearchInput, productSearchInfo }) => {
         onChange={(e) => setSearchInput(e.target.value)}
         defaultValue={router.query?.product}
       />
-      {router.pathname === "/stock-aanvullen" && (
-        <p
-          onClick={(e) => {
-            router.push(`${router.asPath}&product=${productSearchInfo?.name}`);
-          }}
-        >
-          {productSearchInfo?.name}
-        </p>
-      )}
     </div>
   );
 };

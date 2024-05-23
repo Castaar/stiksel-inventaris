@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 import styles from "../../styles/blocks/_category-title.module.scss";
 
-const search = (props) => {
+const dropdownProducts = (props) => {
   const router = useRouter();
 
   return (
@@ -12,9 +12,11 @@ const search = (props) => {
         id="data"
         className={styles["category-search"]}
         onChange={(e) =>
-          router.replace(`/${router.pathname}?collection=${e.target.value}`)
+          router.replace(
+            `/${router.pathname}?collection=${router.query.collection}&state=${e.target.value}`
+          )
         }
-        defaultValue={router.query?.collection}
+        defaultValue={router.query?.state}
       >
         <option defaultChecked>Selecteer</option>
         {props.collections.map((collection, index) => {
@@ -24,8 +26,11 @@ const search = (props) => {
             </option>
           );
         })}
+        {router.pathname === "/stock-aanvullen" && (
+          <option value="new">Nieuw product</option>
+        )}
       </select>
     </div>
   );
 };
-export default search;
+export default dropdownProducts;

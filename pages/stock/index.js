@@ -1,10 +1,10 @@
 import React from "react";
 
 // DB connect
-import clientPromise from "../lib/mongodb";
+import clientPromise from "../../lib/mongodb";
 
-import Title from "../components/base/title";
-import Category from "../components/blocks/category";
+import Title from "../../components/base/title";
+import Category from "../../components/blocks/category";
 
 export default function categories(props) {
   return (
