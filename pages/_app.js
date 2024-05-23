@@ -32,8 +32,26 @@ export default function myApp({ Component, pageProps }) {
         <meta name="theme-color" content="#317EFB" />
       </Head>
       <header className="header">
-        <span>Castaar</span>
+        <a href="/">Castaar</a>
+        <span>
+          <svg
+            id="icon_menu"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 35.99 36.069"
+          >
+            <path
+              id="Path_52172"
+              data-name="Path 52172"
+              d="M25.147,0,16.97,8.176,8.725,0,0,8.794,8.176,16.97,0,25.147l8.726,8.795L16.97,25.7l8.176,8.245,8.726-8.795L25.7,16.97l8.176-8.176Z"
+              transform="translate(1.059 1.063)"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            ></path>
+          </svg>
+        </span>
       </header>
+      <nav className="navigation">{/* <Link></Link> */}</nav>
       <Component {...pageProps} />
     </>
   );

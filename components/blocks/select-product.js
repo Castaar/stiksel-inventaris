@@ -2,12 +2,14 @@ import { useRouter } from "next/router";
 
 import styles from "../../styles/blocks/_product.module.scss";
 
-const product = (props) => {
+const selectProduct = (props) => {
   const router = useRouter();
 
   function cmToMeters(cm) {
     return cm / 100;
   }
+
+  console.log(router.query);
 
   return (
     <div className={styles["product"]}>
@@ -23,13 +25,15 @@ const product = (props) => {
         <a
           className={styles["product-link"]}
           onClick={() =>
-            router.push(`/product/${props.number}?cat=${router.query.slug}`)
+            router.push(
+              `/order/?collection=${router.query.collection}&id=${props._id}`
+            )
           }
         >
-          Bewerk
+          Selecteer
         </a>
       )}
     </div>
   );
 };
-export default product;
+export default selectProduct;

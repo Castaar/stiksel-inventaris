@@ -36,14 +36,46 @@ a {
   &-overview {
     gap: 40px;
   }
+  &-list {
+    &-stock {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 100px;
+    }
+  }
 }
 
 .header {
   padding: 50px 100px;
-  span {
+  display: flex;
+  justify-content: space-between;
+  z-index: 999;
+  a {
     font-size: 45px;
     font-weight: 900;
     color: $gold;
     text-transform: uppercase;
   }
+  span {
+    display: flex;
+    align-items: center;
+    svg {
+      color: $gold;
+      aspect-ratio: 1;
+      width: 34px;
+      height: 34px;
+    }
+  }
+}
+
+.navigation {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 0 60px;
+  border-left: 3px solid $gold;
+  height: 100%;
+  z-index: 998;
+  max-width: 375px;
+  width: 100%;
 }

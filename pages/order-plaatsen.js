@@ -7,7 +7,7 @@ import clientPromise from "../lib/mongodb";
 import Title from "../components/base/title";
 import Search from "../components/base/search";
 import Dropdown from "../components/base/dropdown";
-import Product from "../components/blocks/product";
+import Product from "../components/blocks/select-product";
 
 export default function categories(props) {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function categories(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"Producten"} url={"/categories"} />
+        <Title value={"XX"} url={"/categories"} />
         <div className="main-heading">
           <Dropdown collections={props.collections} />
           <Search setSearchInput={setSearchInput} />

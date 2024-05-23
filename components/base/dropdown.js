@@ -12,9 +12,11 @@ const search = (props) => {
         id="cars"
         className={styles["category-search"]}
         onChange={(e) =>
-          router.replace(`/order-plaatsen?collection=${e.target.value}`)
+          router.replace(`/${router.pathname}?collection=${e.target.value}`)
         }
+        defaultValue={router.query?.collection}
       >
+        <option defaultChecked>Selecteer</option>
         {props.collections.map((collection, index) => {
           return (
             <option key={index} value={collection.name}>
