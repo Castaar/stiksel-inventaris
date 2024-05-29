@@ -9,8 +9,6 @@ const selectProduct = (props) => {
     return cm / 100;
   }
 
-  console.log(router.query);
-
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>{props.name}</p>

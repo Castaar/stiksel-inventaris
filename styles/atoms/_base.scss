@@ -21,6 +21,7 @@ a {
   padding: 65px 90px;
   display: grid;
   grid-template-rows: auto 1fr;
+  margin-top: 120px;
   &-heading {
     display: grid;
     grid-template-columns: 0.75fr 1fr;
@@ -46,12 +47,14 @@ a {
 }
 
 .header {
-  padding: 50px 100px;
+  padding: 50px 100px 0px;
   display: flex;
   justify-content: space-between;
   z-index: 999;
   position: fixed;
   width: 100%;
+  top: 0;
+  background: linear-gradient(to bottom, hsl(0, 0%, 0%) 0%, hsla(0, 0%, 0%, 0.991) 10.4%, hsla(0, 0%, 0%, 0.966) 19.9%, hsla(0, 0%, 0%, 0.927) 28.4%, hsla(0, 0%, 0%, 0.875) 36%, hsla(0, 0%, 0%, 0.812) 43%, hsla(0, 0%, 0%, 0.74) 49.5%, hsla(0, 0%, 0%, 0.661) 55.4%, hsla(0, 0%, 0%, 0.578) 61%, hsla(0, 0%, 0%, 0.49) 66.4%, hsla(0, 0%, 0%, 0.401) 71.6%, hsla(0, 0%, 0%, 0.313) 76.9%, hsla(0, 0%, 0%, 0.227) 82.2%, hsla(0, 0%, 0%, 0.145) 87.8%, hsla(0, 0%, 0%, 0.068) 93.7%, hsla(0, 0%, 0%, 0) 100%);
   a {
     font-size: 45px;
     font-weight: 900;

@@ -14,22 +14,52 @@ import styles from "../styles/blocks/_category-title.module.scss";
 
 export default function categories(props) {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState("");
+
   const [stockInput, setStockInput] = useState({});
 
-  let productsResult;
-  props.products.filter((product) => {
-    let productName = product.name.toLowerCase();
-    if (searchInput) {
-      if (productName.includes(searchInput.toLowerCase())) {
-        productsResult = product;
-      } else {
-        return "";
-      }
-    }
-  });
+  const saveToMongo = async () => {
+    // get old data
+    let productOld = props.products
+      .filter((product) => product._id === stockInput._id)
+      .map((product) => {
+        return product;
+      });
 
-  console.log(stockInput);
+    const state = router.query.state === "new" ? true : false;
+
+    // create new data
+    let data = {
+      state: state ? true : false,
+      _id: state ? "" : productOld[0]?._id,
+      name: state ? stockInput.name : productOld[0].name,
+      format: state ? stockInput.format : productOld[0].format,
+      price: state ? stockInput.price : productOld[0].price,
+      number: state ? stockInput.number : productOld[0].number,
+      unit: state ? stockInput.unit : productOld[0].unit,
+      available: state
+        ? stockInput.available
+        : productOld[0].available + stockInput.available,
+    };
+
+    // add data to MongoDB
+    try {
+      fetch(
+        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+          process.env.NEXT_PUBLIC_API
+        }/api/add-stock?collection=${router.query?.collection}`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <main className="main">
@@ -38,12 +68,12 @@ export default function categories(props) {
         <div className="main-heading">
           <Dropdown collections={props.collections} />
           {router.query?.collection && (
-            <DropdownProducts collections={props.products} />
+            <DropdownProducts
+              collections={props.products}
+              setStockInput={setStockInput}
+              stockInput={stockInput}
+            />
           )}
-          {/* <Search
-            setSearchInput={setSearchInput}
-            productSearchInfo={productsResult}
-          /> */}
         </div>
       </div>
       <div className="main-list-stock">
@@ -55,25 +85,27 @@ export default function categories(props) {
               onChange={(e) =>
                 setStockInput((stockInput) => ({
                   ...stockInput,
-                  format: e.target.value,
+                  name: e.target.value,
                 }))
               }
               defaultValue={stockInput.name}
             />
           </div>
         )}
-        <div className={styles["category"]}>
-          <input
-            className={styles["category-search"]}
-            placeholder="Formaat"
-            onChange={(e) =>
-              setStockInput((stockInput) => ({
-                ...stockInput,
-                format: `${e.target.value} cm`,
-              }))
-            }
-          />
-        </div>
+        {router.query?.state === "new" && (
+          <div className={styles["category"]}>
+            <input
+              className={styles["category-search"]}
+              placeholder="Formaat"
+              onChange={(e) =>
+                setStockInput((stockInput) => ({
+                  ...stockInput,
+                  format: `${e.target.value} cm`,
+                }))
+              }
+            />
+          </div>
+        )}
         <div className={styles["category"]}>
           <input
             className={styles["category-search"]}
@@ -82,40 +114,61 @@ export default function categories(props) {
             onChange={(e) =>
               setStockInput((stockInput) => ({
                 ...stockInput,
-                format: Number(e.target.value),
+                available: Number(e.target.value),
               }))
             }
           />
         </div>
-        <div className={styles["category"]}>
-          <input
-            className={styles["category-search"]}
-            placeholder="Nummer"
-            type="number"
-            onChange={(e) =>
-              setStockInput((stockInput) => ({
-                ...stockInput,
-                number: Number(e.target.value),
-              }))
-            }
-          />
-        </div>
-        <div className={styles["category"]}>
-          <input
-            className={styles["category-search"]}
-            placeholder="Prijs"
-            type="number"
-            onChange={(e) =>
-              setStockInput((stockInput) => ({
-                ...stockInput,
-                price: Number(e.target.value),
-              }))
-            }
-          />
-        </div>
+        {router.query?.state === "new" && (
+          <div className={styles["category"]}>
+            <input
+              className={styles["category-search"]}
+              placeholder="Eenheid"
+              onChange={(e) =>
+                setStockInput((stockInput) => ({
+                  ...stockInput,
+                  unit: e.target.value,
+                }))
+              }
+              defaultValue={stockInput.unit}
+            />
+          </div>
+        )}
+        {router.query?.state === "new" && (
+          <div className={styles["category"]}>
+            <input
+              className={styles["category-search"]}
+              placeholder="Nummer"
+              type="number"
+              onChange={(e) =>
+                setStockInput((stockInput) => ({
+                  ...stockInput,
+                  number: Number(e.target.value),
+                }))
+              }
+            />
+          </div>
+        )}
+        {router.query?.state === "new" && (
+          <div className={styles["category"]}>
+            <input
+              className={styles["category-search"]}
+              placeholder="Prijs"
+              type="number"
+              onChange={(e) =>
+                setStockInput((stockInput) => ({
+                  ...stockInput,
+                  price: Number(e.target.value),
+                }))
+              }
+            />
+          </div>
+        )}
       </div>
       <div className="btn-wrapper">
-        <button className="btn">Bewaar</button>
+        <button className="btn" onClick={saveToMongo}>
+          Bewaar
+        </button>
       </div>
     </main>
   );

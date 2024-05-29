@@ -11,23 +11,33 @@ const dropdownProducts = (props) => {
         name="data"
         id="data"
         className={styles["category-search"]}
-        onChange={(e) =>
+        onChange={(e) => {
+          const selectedOption = e.target.options[e.target.selectedIndex];
           router.replace(
-            `/${router.pathname}?collection=${router.query.collection}&state=${e.target.value}`
-          )
-        }
+            `/${router.pathname}?collection=${
+              router.query.collection
+            }&state=${selectedOption.getAttribute("name")}`
+          );
+          props.setStockInput((stockInput) => ({
+            ...stockInput,
+            _id: selectedOption.value,
+            name: selectedOption.getAttribute("name"),
+          }));
+        }}
         defaultValue={router.query?.state}
       >
         <option defaultChecked>Selecteer</option>
         {props.collections.map((collection, index) => {
           return (
-            <option key={index} value={collection.name}>
+            <option key={index} value={collection._id} name={collection.name}>
               {collection.name}
             </option>
           );
         })}
         {router.pathname === "/stock-aanvullen" && (
-          <option value="new">Nieuw product</option>
+          <option value="new" name="new">
+            Nieuw product
+          </option>
         )}
       </select>
     </div>

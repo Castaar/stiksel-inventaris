@@ -7,10 +7,11 @@ const productItem = (props) => {
 
   return (
     <div className={styles["product"]}>
+      <label>{props.label}:</label>
       <input
         className={styles["product-item"]}
         placeholder="Search"
-        defaultValue={props.value}
+        defaultValue={props.value + " " + (props.unit ? props.unit : "")}
       />
     </div>
   );

@@ -61,10 +61,18 @@ export default function myApp({ Component, pageProps }) {
       </header>
       {navActive && (
         <nav className="navigation">
-          <Link href="/">Home</Link>
-          <Link href="/order-plaatsen">Order plaatsen</Link>
-          <Link href="/stock">Stock</Link>
-          <Link href="/stock-aanvullen">Stock aanvullen</Link>
+          <Link href="/" onClick={handleToggleNav}>
+            Home
+          </Link>
+          <Link href="/order-plaatsen" onClick={handleToggleNav}>
+            Order plaatsen
+          </Link>
+          <Link href="/stock" onClick={handleToggleNav}>
+            Stock
+          </Link>
+          <Link href="/stock-aanvullen" onClick={handleToggleNav}>
+            Stock aanvullen
+          </Link>
         </nav>
       )}
       <Component {...pageProps} />

@@ -20,11 +20,13 @@ export default function category({ product }) {
         </div>
       </div>
       <div className="main-detail">
-        <div>
-          <ProductItem value={product.name} />
-          <ProductItem value={product.number} />
-          <ProductItem value={product.available} />
-        </div>
+        <ProductItem value={product.name} label={"Naam"} />
+        <ProductItem value={product.number} label={"Artikelnr"} />
+        <ProductItem
+          value={product.available}
+          label={"Beschikbaar"}
+          unit={product.unit}
+        />
       </div>
     </main>
   );
