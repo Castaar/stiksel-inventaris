@@ -11,10 +11,20 @@ const product = (props) => {
 
   return (
     <div className={styles["product"]}>
-      <p className={styles["product-title"]}>{props.name}</p>
-      <p className={styles["product-title"]}>{props.format}</p>
-      <p className={styles["product-title"]}>{props.number}</p>
       <p className={styles["product-title"]}>
+        <span className={styles["product-label"]}>Naam: </span>
+        {props.name}
+      </p>
+      <p className={styles["product-title"]}>
+        <span className={styles["product-label"]}>Formaat: </span>
+        {props.format}
+      </p>
+      <p className={styles["product-title"]}>
+        <span className={styles["product-label"]}>Artikelnr: </span>
+        {props.number}
+      </p>
+      <p className={styles["product-title"]}>
+        <span className={styles["product-label"]}>Voorraad: </span>
         {typeof props.available === "number"
           ? cmToMeters(props.available)
           : props.available}

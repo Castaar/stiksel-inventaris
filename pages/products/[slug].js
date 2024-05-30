@@ -20,7 +20,7 @@ export default function category(props) {
           <Search setSearchInput={setSearchInput} />
         </div>
       </div>
-      <div>
+      <div className="main-scroll">
         <Product
           name={"Omschrijving:"}
           format={"Formaat:"}

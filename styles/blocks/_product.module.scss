@@ -1,13 +1,19 @@
 @import "../variables";
 
 .product {
-    padding: 30px 50px;
+    padding: clamp(0.9375rem, 0.3139rem + 1.301vw, 1.875rem) clamp(1.5625rem, 0.5231rem + 2.1683vw, 3.125rem);
     border-bottom: 2px solid $gold;
     height: fit-content;
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
     column-gap: 50px;
     align-items: center;
+    @include sm-breakpoint {
+        grid-template-columns: 1fr;
+        &:first-child {
+            display: none;
+        }
+    }
     &-title {
         color: $white;
         font-size: 25px;
@@ -18,6 +24,13 @@
         transition: all .3s;
         &:hover {
             color: $gold;
+        }
+    }
+    &-label {
+        display: none;
+        color: $gold;
+        @include sm-breakpoint {
+            display: flex;
         }
     }
 }

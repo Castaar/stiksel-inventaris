@@ -1,7 +1,7 @@
 @import "../variables";
 
 .title {
-    margin: 90px 0 75px;
+    margin: clamp(1.875rem, -0.6196rem + 5.2038vw, 5.625rem) 0 clamp(1.875rem, 0.0041rem + 3.9029vw, 4.6875rem);
     display: flex;
     justify-content: space-between;
     align-items: flex-end;

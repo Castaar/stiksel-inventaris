@@ -1,12 +1,12 @@
 @import "../variables";
 
 .category {
-    padding: 30px 50px;
+    padding: clamp(0.9375rem, 0.3139rem + 1.301vw, 1.875rem) clamp(1.5625rem, 0.5231rem + 2.1683vw, 3.125rem);
     border-bottom: 2px solid $gold;
     cursor: pointer;
     &-title {
         color: $white;
-        font-size: 30px;
+        font-size: clamp(1.125rem, 0.6261rem + 1.0408vw, 1.875rem);
         font-weight: 900;
         text-transform: uppercase;
         transition: all .3s;

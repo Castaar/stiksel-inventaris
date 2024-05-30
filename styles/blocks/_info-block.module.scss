@@ -1,23 +1,24 @@
 @import "../variables";
 
 .info {
-    padding: 30px 80px;
+    padding: clamp(1.25rem, 0.8342rem + 0.8673vw, 1.875rem) clamp(1.25rem, -1.2446rem + 5.2038vw, 5rem);
     border: 2px solid $gold;
-    width: fit-content;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     &-value {
         color: $black;
-        font-size: 135px;
+        font-size: clamp(3.125rem, -0.409rem + 7.3721vw, 8.4375rem);
         font-weight: 900;
-        -webkit-text-stroke-width: 2px;
+        -webkit-text-stroke-width: clamp(0.0625rem, 0.0209rem + 0.0867vw, 0.125rem);
         -webkit-text-stroke-color: $gold;
     }
     &-title {
         color: $white;
-        font-size: 30px;
+        font-size: clamp(1.125rem, 0.6261rem + 1.0408vw, 1.875rem);
         font-weight: 900;
         text-transform: uppercase;
+        text-align: center;
     }
 }
