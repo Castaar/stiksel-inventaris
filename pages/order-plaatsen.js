@@ -69,7 +69,7 @@ export default function order(props) {
                 },
               }
             ).then(function (a) {
-              console.log(a);
+              a.ok && router.push("/bevestiging");
             });
         });
       } catch (error) {

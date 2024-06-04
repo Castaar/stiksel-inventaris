@@ -34,13 +34,13 @@ export default async (req, res) => {
     dynamicTemplateData: data,
     templateId: templateId,
   };
-  //   try {
-  //     await sgMail.send(msg);
-  //     res.status(200).json({ message: "Email sent successfully" });
-  //   } catch (error) {
-  //     console.log(error.response.body);
-  //     res
-  //       .status(500)
-  //       .json({ error: "An error occurred while sending the email" });
-  //   }
+  try {
+    // await sgMail.send(msg);
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (error) {
+    console.log(error.response.body);
+    res
+      .status(500)
+      .json({ error: "An error occurred while sending the email" });
+  }
 };

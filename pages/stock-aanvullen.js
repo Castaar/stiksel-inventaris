@@ -55,7 +55,9 @@ export default function categories(props) {
             "Content-Type": "application/json",
           },
         }
-      );
+      ).then(function (a) {
+        a.ok && router.push("/bevestiging");
+      });
     } catch (error) {
       console.log(error);
     }
