@@ -5,6 +5,8 @@ import styles from "../../styles/blocks/_product-item.module.scss";
 const productItem = (props) => {
   const router = useRouter();
 
+  console.log(props);
+
   return (
     <div className={styles["product"]}>
       <label>{props.label}:</label>

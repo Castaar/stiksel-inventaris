@@ -83,7 +83,7 @@ export default function order(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"Order plaatsen"} url={"/stock"} />
+        <Title value={"Stock verminderen"} url={"/stock"} />
         <div className="main-heading">
           <Dropdown collections={props.collections} />
           {router.query?.collection && (

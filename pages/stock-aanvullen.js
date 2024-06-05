@@ -90,7 +90,9 @@ export default function categories(props) {
                   name: e.target.value,
                 }))
               }
-              defaultValue={stockInput.name}
+              defaultValue={
+                stockInput.name === "new" ? "Omschrijving" : stockInput.name
+              }
             />
           </div>
         )}

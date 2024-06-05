@@ -64,8 +64,8 @@ export default function myApp({ Component, pageProps }) {
           <Link href="/" onClick={handleToggleNav}>
             Home
           </Link>
-          <Link href="/order-plaatsen" onClick={handleToggleNav}>
-            Order plaatsen
+          <Link href="/stock-verminderen" onClick={handleToggleNav}>
+            Stock verminderen
           </Link>
           <Link href="/stock" onClick={handleToggleNav}>
             Stock
