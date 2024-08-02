@@ -17,7 +17,7 @@ export default function categories(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"XX"} url={"/categories"} />
+        <Title value={"XX"} url={"/stock"} />
         <div className="main-heading">
           {/* <Dropdown collections={props.collections} /> */}
           {/* <Search setSearchInput={setSearchInput} /> */}

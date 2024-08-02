@@ -55,22 +55,23 @@ export default function order(props) {
             },
           }
         ).then(function (a) {
-          a.ok &&
-            fetch(
-              `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-                process.env.NEXT_PUBLIC_API
-              }/api/mailing`,
-              {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                  Accept: "application/json, text/plain, */*",
-                  "Content-Type": "application/json",
-                },
-              }
-            ).then(function (a) {
-              a.ok && router.push("/bevestiging");
-            });
+          a.ok && router.push("/bevestiging");
+          // a.ok &&
+          //   fetch(
+          //     `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+          //       process.env.NEXT_PUBLIC_API
+          //     }/api/mailing`,
+          //     {
+          //       method: "POST",
+          //       body: JSON.stringify(data),
+          //       headers: {
+          //         Accept: "application/json, text/plain, */*",
+          //         "Content-Type": "application/json",
+          //       },
+          //     }
+          //   ).then(function (a) {
+          //     a.ok && router.push("/bevestiging");
+          //   });
         });
       } catch (error) {
         console.log(error);
@@ -128,7 +129,7 @@ export default function order(props) {
         <div className={styles["category"]}>
           <input
             className={styles["category-search"]}
-            placeholder="Aantal m / stuks"
+            placeholder="Aantal cm / stuks"
             type="number"
             onChange={(e) =>
               setStockInput((stockInput) => ({

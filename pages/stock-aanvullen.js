@@ -32,7 +32,7 @@ export default function categories(props) {
       state: state ? true : false,
       _id: state ? "" : productOld[0]?._id,
       name: state ? stockInput.name : productOld[0].name,
-      format: state ? stockInput.format : productOld[0].format,
+      format: state ? (typeof stockInput.format === "undefined"? "" : " cm")  : productOld[0].format + " cm",
       price: state ? stockInput.price : productOld[0].price,
       number: state ? stockInput.number : productOld[0].number,
       unit: state ? stockInput.unit : productOld[0].unit,
@@ -104,7 +104,7 @@ export default function categories(props) {
               onChange={(e) =>
                 setStockInput((stockInput) => ({
                   ...stockInput,
-                  format: `${e.target.value} cm`,
+                  format: `${e.target.value}`,
                 }))
               }
             />
@@ -125,17 +125,20 @@ export default function categories(props) {
         </div>
         {router.query?.state === "new" && (
           <div className={styles["category"]}>
-            <input
+            <select
               className={styles["category-search"]}
-              placeholder="Eenheid"
-              onChange={(e) =>
+              onChange={(e) => {
                 setStockInput((stockInput) => ({
                   ...stockInput,
                   unit: e.target.value,
-                }))
+                }))}
               }
               defaultValue={stockInput.unit}
-            />
+            >
+              <option value="">eenheid</option>
+              <option value="stuks">stuks</option>
+              <option value="cm">cm</option>
+            </select>
           </div>
         )}
         {router.query?.state === "new" && (

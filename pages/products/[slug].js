@@ -14,7 +14,7 @@ export default function category(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"Producten"} url={"/categories"} />
+        <Title value={"Producten"} url={"/stock"} />
         <div className="main-heading">
           <CategoryTitle />
           <Search setSearchInput={setSearchInput} />
@@ -25,12 +25,12 @@ export default function category(props) {
           name={"Omschrijving:"}
           format={"Formaat:"}
           number={"Productnummer:"}
-          available={"Aantal m beschikbaar:"}
+          available={"Aantal m / stuks beschikbaar:"}
           edit={false}
         />
         {props.products
           .filter((product) => {
-            let productName = product.name.toLowerCase();
+            let productName = product.name?.toLowerCase();
             if (searchInput) {
               if (productName.includes(searchInput.toLowerCase())) {
                 return product;
@@ -41,6 +41,7 @@ export default function category(props) {
               return product;
             }
           })
+          .sort((a, b) => a.name?.localeCompare(b.name))
           .map((product, index) => {
             return <Product key={index} {...product} edit={true} />;
           })}
