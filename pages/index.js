@@ -18,7 +18,7 @@ export default function home(props) {
           value={`€ ${props.totalPrice}`}
           title={"Waarde totale stock"}
         /> */}
-        {/* <InfoBlock value={"XX M2"} title={"Borden"} /> */}
+        <InfoBlock value={"XX M2"} title={"Borden"} />
       </main>
     </>
   );
