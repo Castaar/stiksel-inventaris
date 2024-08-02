@@ -14,11 +14,11 @@ export default function home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="main main-overview">
-        <InfoBlock
+        {/* <InfoBlock
           value={`€ ${props.totalPrice}`}
           title={"Waarde totale stock"}
-        />
-        <InfoBlock value={"XX M2"} title={"Borden"} />
+        /> */}
+        {/* <InfoBlock value={"XX M2"} title={"Borden"} /> */}
       </main>
     </>
   );
