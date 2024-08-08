@@ -5,9 +5,9 @@ import styles from "../../styles/blocks/_product.module.scss";
 const product = (props) => {
   const router = useRouter();
 
-  function cmToMeters(cm) {
-    return cm / 100;
-  }
+  // function cmToMeters(cm) {
+  //   return cm / 100;
+  // }
 
   const unitCheck = props.unit === "stuks";
 
@@ -18,18 +18,12 @@ const product = (props) => {
         {props?.name}
       </p>
       <p className={styles["product-title"]}>
+        <span className={styles["product-label"]}>Voorraad: </span>
+        {props.available}
+      </p>
+      <p className={styles["product-title"]}>
         <span className={styles["product-label"]}>Formaat: </span>
         {props?.format}
-      </p>
-      <p className={styles["product-title"]}>
-        <span className={styles["product-label"]}>Artikelnr: </span>
-        {props?.number}
-      </p>
-      <p className={styles["product-title"]}>
-        <span className={styles["product-label"]}>Voorraad: </span>
-        {typeof props.available === "number"
-          ? (unitCheck ? props.available : cmToMeters(props.available))
-          : props.available}
       </p>
       {props.edit && (
         <a

@@ -26,6 +26,7 @@ export default async (req, res) => {
       $set: {
         name,
         available,
+        format,
       },
     };
 

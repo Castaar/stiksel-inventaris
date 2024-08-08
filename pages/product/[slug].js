@@ -10,7 +10,11 @@ import ProductItem from "../../components/blocks/product-item";
 
 export default function category({ product }) {
   const router = useRouter();
-  const [stockInput, setStockInput] = useState({});
+  const [stockInput, setStockInput] = useState({
+    Beschikbaar: product?.available,
+    Naam: product?.name,
+    Formaat: product?.format
+  });
 
   // delete record
   const removeFromMongo = async () => {
@@ -42,6 +46,7 @@ export default function category({ product }) {
     let data = {
       name: stockInput.Naam,
       available: stockInput.Beschikbaar,
+      format: stockInput.Formaat,
       _id: product?._id,
     };
 
@@ -59,14 +64,12 @@ export default function category({ product }) {
           },
         }
       ).then(function (a) {
-        a.ok && router.push("/bevestiging");
+        a.ok && router.push("/stock");
       });
     } catch (error) {
       console.log(error);
     }
   }
-
-  console.log(stockInput)
 
   return (
     <main className="main">
@@ -78,6 +81,12 @@ export default function category({ product }) {
         <ProductItem 
           value={product?.name} 
           label={"Naam"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
+        />
+        <ProductItem 
+          value={product?.format} 
+          label={"Formaat"}
           stockInput={stockInput}
           setStockInput={setStockInput} 
         />
@@ -112,7 +121,7 @@ export async function getServerSideProps({ query }) {
     const client = await clientPromise;
     const db = client.db("Folies");
 
-    let filter = { number: parseInt(query.slug) };
+    let filter = { number: query.slug };
 
     let document = await db?.collection(query.cat).findOne(filter);
 

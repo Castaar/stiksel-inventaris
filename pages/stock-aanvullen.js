@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { v4 as uuidv4 } from 'uuid';
 
 // DB connect
 import clientPromise from "../lib/mongodb";
@@ -34,7 +35,7 @@ export default function categories(props) {
       name: state ? stockInput.name : productOld[0].name,
       format: state ? (typeof stockInput.format === "undefined"? "" : " cm")  : productOld[0].format + " cm",
       price: state ? stockInput.price : productOld[0].price,
-      number: state ? stockInput.number : productOld[0].number,
+      number: uuidv4(),
       unit: state ? stockInput.unit : productOld[0].unit,
       available: state
         ? stockInput.available
@@ -142,22 +143,6 @@ export default function categories(props) {
               <option value="stuks">stuks</option>
               <option value="cm">cm</option>
             </select>
-          </div>
-        )}
-        {router.query?.state === "new" && (
-          <div className={styles["category"]}>
-            <input
-              className={styles["category-search"]}
-              placeholder="Nummer"
-              type="number"
-              required
-              onChange={(e) =>
-                setStockInput((stockInput) => ({
-                  ...stockInput,
-                  number: Number(e.target.value),
-                }))
-              }
-            />
           </div>
         )}
         {router.query?.state === "new" && (
