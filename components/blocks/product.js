@@ -9,21 +9,21 @@ const product = (props) => {
     return cm / 100;
   }
 
-  const unitCheck = props.unit === "stuks"
+  const unitCheck = props.unit === "stuks";
 
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>
         <span className={styles["product-label"]}>Naam: </span>
-        {props.name}
+        {props?.name}
       </p>
       <p className={styles["product-title"]}>
         <span className={styles["product-label"]}>Formaat: </span>
-        {props.format}
+        {props?.format}
       </p>
       <p className={styles["product-title"]}>
         <span className={styles["product-label"]}>Artikelnr: </span>
-        {props.number}
+        {props?.number}
       </p>
       <p className={styles["product-title"]}>
         <span className={styles["product-label"]}>Voorraad: </span>
@@ -31,7 +31,7 @@ const product = (props) => {
           ? (unitCheck ? props.available : cmToMeters(props.available))
           : props.available}
       </p>
-      {/* {props.edit && (
+      {props.edit && (
         <a
           className={styles["product-link"]}
           onClick={() =>
@@ -40,7 +40,7 @@ const product = (props) => {
         >
           Bewerk
         </a>
-      )} */}
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 
 // DB connect
@@ -10,23 +10,98 @@ import ProductItem from "../../components/blocks/product-item";
 
 export default function category({ product }) {
   const router = useRouter();
+  const [stockInput, setStockInput] = useState({});
+
+  // delete record
+  const removeFromMongo = async () => {
+    // delete data from MongoDB
+    try {
+      fetch(
+        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+          process.env.NEXT_PUBLIC_API
+        }/api/delete-record?collection=${router.query?.cat}`,
+        {
+          method: "POST",
+          body: JSON.stringify(product),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+          },
+        }
+      ).then(function (a) {
+        a.ok && router.push("/bevestiging");
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // add data to MongoDB
+  const updateToMongo = async () => {
+    // create new data
+    let data = {
+      name: stockInput.Naam,
+      available: stockInput.Beschikbaar,
+      _id: product?._id,
+    };
+
+    try {
+      fetch(
+        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+          process.env.NEXT_PUBLIC_API
+        }/api/update-record?collection=${router.query?.cat}`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+          },
+        }
+      ).then(function (a) {
+        a.ok && router.push("/bevestiging");
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  console.log(stockInput)
 
   return (
     <main className="main">
-      <div>
-        <Title value={"Producten"} url={`/products/${router.query.cat}`} />
-        <div className="main-heading">
-          <CategoryTitle title={router.query.cat} />
-        </div>
+      <Title value={"Producten"} url={`/products/${router.query.cat}`} />
+      <div className="main-heading">
+        <CategoryTitle title={router.query.cat} />
       </div>
       <div className="main-detail">
-        <ProductItem value={product.name} label={"Naam"} />
-        <ProductItem value={product.number} label={"Artikelnr"} />
-        <ProductItem
-          value={product.available}
-          label={"Beschikbaar"}
-          unit={product.unit}
+        <ProductItem 
+          value={product?.name} 
+          label={"Naam"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
         />
+        <ProductItem 
+          value={product?.number} 
+          label={"Artikelnr"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
+        />
+        <ProductItem
+          value={product?.available}
+          label={"Beschikbaar"}
+          unit={product?.unit}
+          stockInput={stockInput}
+          setStockInput={setStockInput}
+        />
+      </div>
+      <div className="btn-wrapper">
+        <button className="btn" onClick={updateToMongo}>
+          Bewaar
+        </button>
+        <button className="btn" onClick={removeFromMongo}>
+          Verwijder
+        </button>
       </div>
     </main>
   );

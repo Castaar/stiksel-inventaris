@@ -3,6 +3,8 @@
 .product {
     padding: 30px 50px;
     border-bottom: 2px solid $gold;
+    display: flex;
+    flex-direction: column;
     &-item {
         color: $white;
         font-size: clamp(1.125rem, 0.6261rem + 1.0408vw, 1.875rem);

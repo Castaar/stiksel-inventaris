@@ -19,8 +19,8 @@ a {
   overflow: hidden;
   color: $white;
   padding: 65px clamp(2.1875rem, -0.0992rem + 4.7702vw, 5.625rem);
-  display: grid;
-  grid-template-rows: auto 1fr;
+  // display: grid;
+  // grid-template-rows: auto 1fr;
   margin-top: 120px;
   &-heading {
     display: grid;
@@ -35,7 +35,7 @@ a {
   }
   &-detail {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     column-gap: clamp(1.25rem, -2.0761rem + 6.9384vw, 6.25rem);
     @include sm-breakpoint {
         grid-template-columns: 1fr;
@@ -133,5 +133,7 @@ a {
   &-wrapper {
     margin-top: clamp(1.5625rem, 0.5231rem + 2.1683vw, 3.125rem);
     padding: 0 clamp(1.5625rem, 0.5231rem + 2.1683vw, 3.125rem);
+    gap: clamp(1.5625rem, 0.5231rem + 2.1683vw, 3.125rem);
+    display: flex;
   }
 }

@@ -84,6 +84,7 @@ export default function categories(props) {
             <input
               className={styles["category-search"]}
               placeholder="Omschrijving"
+              required
               onChange={(e) =>
                 setStockInput((stockInput) => ({
                   ...stockInput,
@@ -91,7 +92,7 @@ export default function categories(props) {
                 }))
               }
               defaultValue={
-                stockInput.name === "new" ? "Omschrijving" : stockInput.name
+                stockInput.name === "new" ? "" : stockInput.name
               }
             />
           </div>
@@ -101,6 +102,7 @@ export default function categories(props) {
             <input
               className={styles["category-search"]}
               placeholder="Formaat"
+              required
               onChange={(e) =>
                 setStockInput((stockInput) => ({
                   ...stockInput,
@@ -115,6 +117,7 @@ export default function categories(props) {
             className={styles["category-search"]}
             placeholder="Aantal m / stuks"
             type="number"
+            required
             onChange={(e) =>
               setStockInput((stockInput) => ({
                 ...stockInput,
@@ -147,6 +150,7 @@ export default function categories(props) {
               className={styles["category-search"]}
               placeholder="Nummer"
               type="number"
+              required
               onChange={(e) =>
                 setStockInput((stockInput) => ({
                   ...stockInput,
