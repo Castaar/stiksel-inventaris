@@ -17,7 +17,7 @@ export default async (req, res) => {
     const docId = { _id: new ObjectId(req.body._id) };
 
     // Validate request body
-    const { name, available } = req.body;
+    const { name, available, format } = req.body;
     if (!name || available === undefined) {
       return res.status(400).json({ message: "Invalid request body" });
     }

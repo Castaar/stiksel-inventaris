@@ -13,7 +13,7 @@ const productItem = (props) => {
       <input
         className={styles["product-item"]}
         placeholder="Search"
-        defaultValue={props.value + " " + (props.unit ? props.unit : "")}
+        defaultValue={props.value + " " + (props.unit ? "M" : "")}
         onChange={(e) =>
           props.setStockInput((stock) => ({
             ...stock,

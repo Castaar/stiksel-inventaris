@@ -16,6 +16,8 @@ export default function category({ product }) {
     Formaat: product?.format
   });
 
+  console.log(stockInput)
+
   // delete record
   const removeFromMongo = async () => {
     // delete data from MongoDB
@@ -33,7 +35,7 @@ export default function category({ product }) {
           },
         }
       ).then(function (a) {
-        a.ok && router.push("/bevestiging");
+        a.ok && router.push("/stock");
       });
     } catch (error) {
       console.log(error);
@@ -64,7 +66,7 @@ export default function category({ product }) {
           },
         }
       ).then(function (a) {
-        a.ok && router.push("/stock");
+        a.ok && router.push("/bevestiging");
       });
     } catch (error) {
       console.log(error);

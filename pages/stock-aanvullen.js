@@ -33,7 +33,7 @@ export default function categories(props) {
       state: state ? true : false,
       _id: state ? "" : productOld[0]?._id,
       name: state ? stockInput.name : productOld[0].name,
-      format: state ? (typeof stockInput.format === "undefined"? "" : " cm")  : productOld[0].format + " cm",
+      format: state ? stockInput.format + " cm" : productOld[0].format + " cm",
       price: state ? stockInput.price : productOld[0].price,
       number: uuidv4(),
       unit: state ? stockInput.unit : productOld[0].unit,
@@ -42,26 +42,28 @@ export default function categories(props) {
         : productOld[0].available + stockInput.available,
     };
 
+    console.log(data)
+
     // add data to MongoDB
-    try {
-      fetch(
-        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-          process.env.NEXT_PUBLIC_API
-        }/api/add-stock?collection=${router.query?.collection}`,
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-            Accept: "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-          },
-        }
-      ).then(function (a) {
-        a.ok && router.push("/bevestiging");
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   fetch(
+    //     `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+    //       process.env.NEXT_PUBLIC_API
+    //     }/api/add-stock?collection=${router.query?.collection}`,
+    //     {
+    //       method: "POST",
+    //       body: JSON.stringify(data),
+    //       headers: {
+    //         Accept: "application/json, text/plain, */*",
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   ).then(function (a) {
+    //     a.ok && router.push("/bevestiging");
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (
@@ -102,7 +104,7 @@ export default function categories(props) {
           <div className={styles["category"]}>
             <input
               className={styles["category-search"]}
-              placeholder="Formaat"
+              placeholder="Formaat cm"
               required
               onChange={(e) =>
                 setStockInput((stockInput) => ({
