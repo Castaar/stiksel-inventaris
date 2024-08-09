@@ -42,28 +42,26 @@ export default function categories(props) {
         : productOld[0].available + stockInput.available,
     };
 
-    console.log(data)
-
     // add data to MongoDB
-    // try {
-    //   fetch(
-    //     `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-    //       process.env.NEXT_PUBLIC_API
-    //     }/api/add-stock?collection=${router.query?.collection}`,
-    //     {
-    //       method: "POST",
-    //       body: JSON.stringify(data),
-    //       headers: {
-    //         Accept: "application/json, text/plain, */*",
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   ).then(function (a) {
-    //     a.ok && router.push("/bevestiging");
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      fetch(
+        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
+          process.env.NEXT_PUBLIC_API
+        }/api/add-stock?collection=${router.query?.collection}`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+          },
+        }
+      ).then(function (a) {
+        a.ok && router.push("/bevestiging");
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -143,7 +141,7 @@ export default function categories(props) {
             >
               <option value="">eenheid</option>
               <option value="stuks">stuks</option>
-              <option value="cm">cm</option>
+              <option value="m">m</option>
             </select>
           </div>
         )}
