@@ -9,7 +9,7 @@ import Category from "../../components/blocks/category";
 export default function categories(props) {
   return (
     <main className="main">
-      <Title value={"Stock"} url={"/"} />
+      <Title value={"Stock borden"} url={"/"} />
       <div className="main-list">
         {props.collections.map((collection, index) => {
           return <Category key={index} title={collection.name} />;
@@ -22,7 +22,7 @@ export default function categories(props) {
 export async function getServerSideProps() {
   try {
     const client = await clientPromise;
-    const db = client.db("stock");
+    const db = client.db("stock_borden");
 
     const collections = await db.listCollections().toArray();
 

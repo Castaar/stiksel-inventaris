@@ -35,7 +35,7 @@ export default function categories(props) {
 export async function getServerSideProps({ query }) {
   try {
     const client = await clientPromise;
-    const db = client.db("Folies");
+    const db = client.db("stock");
 
     const collections = await db.listCollections().toArray();
 

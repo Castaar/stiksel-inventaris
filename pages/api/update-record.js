@@ -9,7 +9,7 @@ export default async (req, res) => {
     }
 
     const client = await clientPromise;
-    const db = client.db("Folies");
+    const db = client.db("stock");
 
     const collection = db.collection(req.query.collection);
 

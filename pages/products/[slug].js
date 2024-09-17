@@ -53,7 +53,7 @@ export default function category(props) {
 export async function getServerSideProps({ query }) {
   try {
     const client = await clientPromise;
-    const db = client.db("Folies");
+    const db = client.db("stock");
 
     const allItems = [];
     let toSkip = 0;

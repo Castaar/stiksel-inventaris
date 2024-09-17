@@ -121,7 +121,7 @@ export default function category({ product }) {
 export async function getServerSideProps({ query }) {
   try {
     const client = await clientPromise;
-    const db = client.db("Folies");
+    const db = client.db("stock");
 
     let filter = { number: query.slug };
 

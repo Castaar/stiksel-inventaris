@@ -21,7 +21,7 @@ export default function myApp({ Component, pageProps }) {
         />
         <meta name="description" content="Description" />
         <meta name="keywords" content="Keywords" />
-        <title>Next.js PWA Example</title>
+        <title>Castaar Inventaris</title>
 
         <link rel="manifest" href="/manifest.json" />
         <link
@@ -69,6 +69,9 @@ export default function myApp({ Component, pageProps }) {
           </Link> */}
           <Link href="/stock" onClick={handleToggleNav}>
             Stock
+          </Link>
+          <Link href="/stock-borden" onClick={handleToggleNav}>
+            Stock borden
           </Link>
           <Link href="/stock-aanvullen" onClick={handleToggleNav}>
             Stock aanvullen
