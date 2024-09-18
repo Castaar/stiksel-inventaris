@@ -5,10 +5,8 @@ import { useRouter } from 'next/router';
 
 import styles from "../../styles/blocks/_product-add.module.scss";
 
-export default function Dropdowns({ collections, products, db_name, toast, slug, selectedOption }) {
+export default function Dropdowns({ collections, products, toast, selectedOption }) {
   const router = useRouter();
-
-  console.log("selectedOption", selectedOption);
 
   const [selectedCollection, setSelectedCollection] = useState(router.query.collection || selectedOption || 'Selecteer');
   const [selectedProduct, setSelectedProduct] = useState(router.query.state || 'Selecteer');
@@ -41,10 +39,10 @@ export default function Dropdowns({ collections, products, db_name, toast, slug,
       data = {
         state: true,
         name: stockInput.name,
-        format: stockInput.format ? stockInput.format : '',
+        thickness: stockInput.thickness ? stockInput.thickness : '',
         price: stockInput.price || 0,
         unit: stockInput.unit || '',
-        available: stockInput.available || 0,
+        available: Number(stockInput.available) || 0,
       };
     } else {
       const productOld = products.find(product => product._id === selectedProduct);
@@ -57,16 +55,16 @@ export default function Dropdowns({ collections, products, db_name, toast, slug,
         state: false,
         _id: productOld._id,
         name: productOld.name,
-        format: productOld.format,
+        thickness: productOld.thickness,
         price: productOld.price,
         unit: productOld.unit,
-        available: stockInput.available || 0,
+        available: Number(stockInput.available) || 0,
       };
     }
 
     try {
       await fetch(
-        `/api/add-${db_name}?collection=${selectedCollection}`,
+        `/api/add-borden?collection=${selectedCollection}`,
         {
           method: 'POST',
           body: JSON.stringify(data),
@@ -78,7 +76,7 @@ export default function Dropdowns({ collections, products, db_name, toast, slug,
       ).then((response) => {
         if (response.ok) {
           toast.success(`Stock is aangevuld`);
-          router.push(`/products/${db_name}/${selectedCollection}`);
+          router.push(`/products/borden/${selectedCollection}`);
         } else {
           console.error('Failed to save data');
           toast.error(`'t Spel es kapot`);
@@ -152,12 +150,12 @@ export default function Dropdowns({ collections, products, db_name, toast, slug,
                 <div className={styles["category"]}>
                   <input
                     className={styles["category-search"]}
-                    placeholder={db_name === "stock" ? "Formaat cm" : db_name === "borden" ? "Dikte cm" : "Formaat"}
+                    placeholder="Dikte cm"
                     required
                     onChange={(e) =>
                       setStockInput((prev) => ({
                         ...prev,
-                        format: e.target.value,
+                        thickness: e.target.value,
                       }))
                     }
                   />

@@ -2,7 +2,7 @@ import React from "react";
 import clientPromise from "../lib/mongodb";
 
 import Title from "../components/base/title";
-import ProductAdd from "../components/blocks/product-add";
+import ProductAdd from "../components/blocks/borden-add";
 
 import { toast } from "react-hot-toast";
 
@@ -26,8 +26,6 @@ export default function Categories(props) {
         selectedOption={product ? product : "Selecteer"}
         collections={props.collections}
         products={props.products}
-        db_name="borden"
-        slug="borden"
         toast={toast}
       />
     </main>

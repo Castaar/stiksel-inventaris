@@ -12,13 +12,15 @@ import { ObjectId } from "mongodb";
 
 import { toast } from 'react-hot-toast';
 
+import Link from "next/link";
+
 export default function category({ product }) {
 
   const router = useRouter();
   const [stockInput, setStockInput] = useState({
     Beschikbaar: product?.available,
     Naam: product?.name,
-    Formaat: product?.format
+    Thickness: product?.thickness
   });
 
   // delete record
@@ -55,10 +57,13 @@ export default function category({ product }) {
   // add data to MongoDB
   const updateToMongo = async () => {
 
+    console.log(stockInput)
+    console.log(stockInput.Thickness)
+
     let data = {
       name: stockInput.Naam,
       available: Number(stockInput.Beschikbaar),
-      format: stockInput.Formaat,
+      thickness: stockInput.Thickness,
       _id: product._id,
     };
 
@@ -86,9 +91,13 @@ export default function category({ product }) {
 
   return (
     <main className="main">
-      <Title value={"Borden producten"} url={`/products/${router.query.cat}`} />
-      <div className="main-heading">
-        <CategoryTitle title={router.query.cat} />
+      <div>
+        <div className="title-block">
+          <Link href={`/products/borden/${router.query.cat}`}>
+            <div className="btn-secondary arrow-left">Terug</div>
+          </Link>
+          <Title value={`${router.query.cat}.`} url={`/products/${router.query.cat}`} />
+        </div>        
       </div>
       <div className="main-detail">
         <ProductItem
@@ -98,14 +107,16 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
+          placeholder="Vul een naam in"
         />
         <ProductItem
           input="text"
-          value={product?.format} 
-          label={"Formaat"}
+          value={product?.thickness} 
+          label={"Thickness"}
           stockInput={stockInput}
           setStockInput={setStockInput} 
           disabled={false}
+          placeholder="Vul een dikte in"
         />
         <ProductItem
           input="text"
@@ -114,6 +125,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={true}
+          placeholder="Product id"
         />
         <ProductItem
           input="number"
@@ -123,6 +135,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
+          placeholder="Vul aantal beschikbare meters in"
         />
       </div>
       <div className="btn-wrapper">

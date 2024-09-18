@@ -11,6 +11,8 @@ const product = (props) => {
 
   const unitCheck = props.unit === "stuks";
 
+  console.log(props);
+
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>
@@ -23,12 +25,19 @@ const product = (props) => {
       </p>
       <p className={styles["product-title"]}>
         {
-          props.slug === "stock" && <span className={styles["product-label"]}>Formaat: </span>
+          props.format &&
+          <>
+            <span className={styles["product-label"]}>Formaat: </span>
+            {props?.format}
+          </>
         }
         {
-          props.slug === "borden" && <span className={styles["product-label"]}>Dikte: </span>
+          props.thickness && 
+          <>
+            <span className={styles["product-label"]}>Dikte: </span>
+            {props?.thickness}
+          </>
         }
-        {props?.format}
       </p>
       {props.edit && (
         <a

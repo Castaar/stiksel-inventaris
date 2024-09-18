@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     const collection = db.collection(collectionName);
 
-    const { _id, name, unit, available, format, price } = req.body;
+    const { _id, name, unit, available, thickness, price } = req.body;
 
     if (_id) {
       let objectId;
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
       const updateResult = await collection.updateOne(
         { _id: objectId },
-        { $inc: { available: available } }
+        { $inc: { available: Number(available) } }
       );
 
       if (updateResult.matchedCount === 1) {
@@ -40,8 +40,8 @@ export default async function handler(req, res) {
         const newProduct = {
           name,
           unit,
-          available: available || 0,
-          format: format || '',
+          available: Number(available) || 0,
+          thickness: thickness || '',
           price: price || 0,
         };
 
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
         name,
         unit: unit || '',
         available,
-        format: format || '',
+        thickness: thickness || '',
         price: price || 0,
       };
 

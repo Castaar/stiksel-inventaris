@@ -24,8 +24,11 @@ export default async (req, res) => {
 
     const docId = { _id: objectId };
 
+    console.log('req.body');
+    console.log(req.body);
+
     // Validate request body
-    const { name, available, format } = req.body;
+    const { name, available, thickness } = req.body;
     // if (!name || available === undefined) {
     //   return res.status(400).json({ message: "Invalid request body" });
     // }
@@ -34,7 +37,7 @@ export default async (req, res) => {
       $set: {
         name,
         available,
-        format,
+        thickness,
       },
     };
 

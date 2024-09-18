@@ -16,6 +16,8 @@
         font-family: $font-body;
         &::placeholder {
             color: $white;
+            opacity: 0.5;
+            text-transform: none;
         }
     }
     label {

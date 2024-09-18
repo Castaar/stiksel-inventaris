@@ -13,7 +13,6 @@
     &-search {
         color: $white;
         font-size: clamp(1.125rem, 0.6261rem + 1.0408vw, 1.875rem);
-        font-weight: 900;
         text-transform: uppercase;
         transition: all .3s;
         outline: none;
@@ -23,6 +22,7 @@
         width: 100%;
         &::placeholder {
             color: $white;
+            opacity: 0.5;
         }
     }
 }

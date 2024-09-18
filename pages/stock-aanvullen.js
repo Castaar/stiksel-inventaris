@@ -2,7 +2,7 @@ import React from "react";
 import clientPromise from "../lib/mongodb";
 
 import Title from "../components/base/title";
-import ProductAdd from "../components/blocks/product-add";
+import ProductAdd from "../components/blocks/stock-add";
 
 import { toast } from "react-hot-toast";
 
@@ -14,7 +14,7 @@ export default function Categories(props) {
 
   const router = useRouter();
   const { product } = router.query;
-  
+
   return (
     <main className="main">
 
@@ -28,8 +28,6 @@ export default function Categories(props) {
         selectedOption={product ? product : "Selecteer"}
         collections={props.collections}
         products={props.products}
-        db_name="stock"
-        slug="stock"
         toast={toast}
       />
     </main>

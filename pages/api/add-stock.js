@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
       const updateResult = await collection.updateOne(
         { _id: objectId },
-        { $inc: { available: available } }
+        { $inc: { available: Number(available) } }
       );
 
       if (updateResult.matchedCount === 1) {
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         const newProduct = {
           name,
           unit,
-          available: available || 0,
+          available: Number(available) || 0,
           format: format || '',
           price: price || 0,
         };

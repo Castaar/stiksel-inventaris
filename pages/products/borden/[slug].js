@@ -36,7 +36,7 @@ export default function category(props) {
           props.products.length === 0 ?
             <div className="no-products-found">
               <h2>Geen producten gevonden</h2>
-              <Link href={`/stock-aanvullen?product=${props.slug}`}>
+              <Link href={`/borden-aanvullen?product=${props.slug}`}>
                 <div className="btn-secondary cross">Aanvullen</div>
               </Link>
             </div>

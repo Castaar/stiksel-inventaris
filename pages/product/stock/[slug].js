@@ -12,6 +12,8 @@ import { ObjectId } from "mongodb";
 
 import { toast } from 'react-hot-toast';
 
+import Link from "next/link";
+
 export default function category({ product }) {
 
   const router = useRouter();
@@ -86,9 +88,13 @@ export default function category({ product }) {
 
   return (
     <main className="main">
-      <Title value={"Stock producten"} url={`/products/${router.query.cat}`} />
-      <div className="main-heading">
-        <CategoryTitle title={router.query.cat} />
+      <div>
+        <div className="title-block">
+          <Link href={`/products/stock/${router.query.cat}`}>
+            <div className="btn-secondary arrow-left">Terug</div>
+          </Link>
+          <Title value={`${router.query.cat}.`} url={`/products/${router.query.cat}`} />
+        </div>        
       </div>
       <div className="main-detail">
         <ProductItem
@@ -98,6 +104,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
+          placeholder="Vul een naam in"
         />
         <ProductItem
           input="text"
@@ -106,6 +113,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput} 
           disabled={false}
+          placeholder="Vul een formaat in"
         />
         <ProductItem
           input="text"
@@ -114,6 +122,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={true}
+          placeholder="Product id"
         />
         <ProductItem
           input="number"
@@ -123,6 +132,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
+          placeholder="Vul aantal beschikbare meters in"
         />
       </div>
       <div className="btn-wrapper">
