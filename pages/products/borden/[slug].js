@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
 // DB connect
-import clientPromise from "../../lib/mongodb";
+import clientPromise from "../../../lib/mongodb";
 
-import Title from "../../components/base/title";
-import CategoryTitle from "../../components/blocks/category-title";
-import Search from "../../components/base/search";
-import Product from "../../components/blocks/product";
+import Title from "../../../components/base/title";
+import CategoryTitle from "../../../components/blocks/category-title";
+import Search from "../../../components/base/search";
+import Product from "../../../components/blocks/product";
 
 export default function category(props) {
   const [searchInput, setSearchInput] = useState();
@@ -14,7 +14,7 @@ export default function category(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"Producten"} url={"/stock"} />
+        <Title value={"Borden producten"} url={"/borden"} />
         <div className="main-heading">
           <CategoryTitle />
           <Search setSearchInput={setSearchInput} />
@@ -43,7 +43,7 @@ export default function category(props) {
           })
           .sort((a, b) => a.name?.localeCompare(b.name))
           .map((product, index) => {
-            return <Product key={index} {...product} edit={true} />;
+            return <Product key={index} {...product} edit={true} slug="borden" />;
           })}
       </div>
     </main>
@@ -53,7 +53,7 @@ export default function category(props) {
 export async function getServerSideProps({ query }) {
   try {
     const client = await clientPromise;
-    const db = client.db("stock");
+    const db = client.db("borden");
 
     const allItems = [];
     let toSkip = 0;

@@ -10,12 +10,12 @@ export default function Categories(props) {
   return (
     <main className="main">
       <div>
-        <Title value={"Stock aanvullen"} url={"/stock"} />
+        <Title value={"Borden aanvullen"} url={"/borden"} />
         <ProductAdd
           collections={props.collections}
           products={props.products}
-          db_name="stock"
-          slug="stock"
+          db_name="borden"
+          slug="borden"
           toast={toast}
         />
       </div>
@@ -26,7 +26,7 @@ export default function Categories(props) {
 export async function getServerSideProps({ query }) {
   try {
     const client = await clientPromise;
-    const db = client.db("stock");
+    const db = client.db("borden");
 
     const collections = await db.listCollections().toArray();
 

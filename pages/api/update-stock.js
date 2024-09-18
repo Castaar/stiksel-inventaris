@@ -2,6 +2,7 @@ import clientPromise from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
+
   try {
     // Ensure the request is a POST or PUT method
     if (req.method !== "POST" && req.method !== "PUT") {
@@ -13,14 +14,21 @@ export default async (req, res) => {
 
     const collection = db.collection(req.query.collection);
 
-    // Ensure _id is a valid ObjectId
-    const docId = { _id: new ObjectId(req.body._id) };
+    let objectId;
+    try {
+      objectId = ObjectId.createFromHexString(req.body._id)
+    } catch (error) {
+      console.log("Invalid ObjectId");
+      return { props: { product: null } };
+    }
+
+    const docId = { _id: objectId };
 
     // Validate request body
     const { name, available, format } = req.body;
-    if (!name || available === undefined) {
-      return res.status(400).json({ message: "Invalid request body" });
-    }
+    // if (!name || available === undefined) {
+    //   return res.status(400).json({ message: "Invalid request body" });
+    // }
 
     const updateDoc = {
       $set: {
@@ -32,10 +40,8 @@ export default async (req, res) => {
 
     const options = { upsert: true };
 
-    // Perform the update
     const result = await collection.updateOne(docId, updateDoc, options);
 
-    // Return the result
     res.status(200).json(result);
   } catch (e) {
     console.error(e);

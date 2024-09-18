@@ -1,31 +1,33 @@
-import { useRouter } from "next/router";
+'use client';
+
+import React from 'react';
 
 import styles from "../../styles/blocks/_category-title.module.scss";
 
-const search = (props) => {
-  const router = useRouter();
+const Dropdown = ({ collections, selectedCollection, onCollectionChange }) => {
+  const handleChange = (e) => {
+    const selectedValue = e.target.value;
+    onCollectionChange(selectedValue);
+  };
 
   return (
     <div className={styles["category"]}>
       <select
-        name="data"
-        id="data"
+        name="collection"
+        id="collection"
         className={styles["category-search"]}
-        onChange={(e) =>
-          router.replace(`/${router.pathname}?collection=${e.target.value}`)
-        }
-        defaultValue={router.query?.collection}
+        onChange={handleChange}
+        value={selectedCollection}
       >
-        <option defaultChecked>Selecteer</option>
-        {props.collections.map((collection, index) => {
-          return (
-            <option key={index} value={collection.name}>
-              {collection.name}
-            </option>
-          );
-        })}
+        <option value="Selecteer">Selecteer</option>
+        {collections.map((collection, index) => (
+          <option key={index} value={collection.name}>
+            {collection.name}
+          </option>
+        ))}
       </select>
     </div>
   );
 };
-export default search;
+
+export default Dropdown;

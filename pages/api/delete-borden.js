@@ -1,16 +1,26 @@
 import clientPromise from "../../lib/mongodb";
 
+import { ObjectId } from "mongodb";
+
 export default async (req, res) => {
   try {
     const client = await clientPromise;
-    const db = client.db("stock");
+    const db = client.db("borden");
 
     const collection = db.collection(req.query.collection);
-    const docId = { number: req.body.number };
+
+    let objectId;
+    try {
+      objectId = ObjectId.createFromHexString(req.body)
+    } catch (error) {
+      console.log("Invalid ObjectId");
+      return { props: { product: null } };
+    }
+
+    const docId = { _id: objectId };
 
     let result;
 
-    // check state if new product
     result = await collection.deleteOne(docId);
 
     res.json(result);

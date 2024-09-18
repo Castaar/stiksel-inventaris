@@ -2,6 +2,8 @@ import clientPromise from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
+
+  console.log(req.body)
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -9,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const client = await clientPromise;
-    const db = client.db("stock");
+    const db = client.db("borden");
 
     const { collection: collectionName } = req.query;
     if (!collectionName) {
@@ -34,7 +36,7 @@ export default async function handler(req, res) {
       );
 
       if (updateResult.matchedCount === 1) {
-        return res.status(200).json({ message: 'Stock updated successfully' });
+        return res.status(200).json({ message: 'Borden updated successfully' });
       } else {
         const newProduct = {
           name,

@@ -3,6 +3,8 @@ import "../styles/globals.scss";
 import Link from "next/link";
 import { useState } from "react";
 
+import { Toaster } from "react-hot-toast";
+
 export default function myApp({ Component, pageProps }) {
   const [navActive, setNavActive] = useState(false);
 
@@ -12,6 +14,7 @@ export default function myApp({ Component, pageProps }) {
 
   return (
     <>
+      <Toaster position="bottom-center" />
       <Head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -54,7 +57,7 @@ export default function myApp({ Component, pageProps }) {
               transform="translate(1.059 1.063)"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             ></path>
           </svg>
         </span>
@@ -70,11 +73,14 @@ export default function myApp({ Component, pageProps }) {
           <Link href="/stock" onClick={handleToggleNav}>
             Stock
           </Link>
-          <Link href="/stock-borden" onClick={handleToggleNav}>
-            Stock borden
+          <Link href="/borden" onClick={handleToggleNav}>
+            Borden
           </Link>
           <Link href="/stock-aanvullen" onClick={handleToggleNav}>
             Stock aanvullen
+          </Link>
+          <Link href="/borden-aanvullen" onClick={handleToggleNav}>
+            Borden aanvullen
           </Link>
         </nav>
       )}

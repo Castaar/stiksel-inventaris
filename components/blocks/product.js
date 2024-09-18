@@ -22,14 +22,19 @@ const product = (props) => {
         {props.available}
       </p>
       <p className={styles["product-title"]}>
-        <span className={styles["product-label"]}>Formaat: </span>
+        {
+          props.slug === "stock" && <span className={styles["product-label"]}>Formaat: </span>
+        }
+        {
+          props.slug === "borden" && <span className={styles["product-label"]}>Dikte: </span>
+        }
         {props?.format}
       </p>
       {props.edit && (
         <a
           className={styles["product-link"]}
           onClick={() =>
-            router.push(`/product/${props.number}?cat=${router.query.slug}`)
+            router.push(`/product/${props.slug}/${props._id}?cat=${router.query.slug}`)
           }
         >
           Bewerk

@@ -13,7 +13,6 @@ const selectProduct = (props) => {
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>{props.name}</p>
       <p className={styles["product-title"]}>{props.format}</p>
-      <p className={styles["product-title"]}>{props.number}</p>
       <p className={styles["product-title"]}>
         {props.available}
       </p>

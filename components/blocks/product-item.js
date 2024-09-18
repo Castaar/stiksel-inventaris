@@ -9,17 +9,19 @@ const productItem = (props) => {
 
   return (
     <div className={styles["product"]}>
-      <label>{props.label}:</label>
+      <label>{props.label} {`${props.unit ? "(M)" : ""}`}:</label>
       <input
+        type={props.input}
         className={styles["product-item"]}
         placeholder="Search"
-        defaultValue={props.value + " " + (props.unit ? "M" : "")}
+        defaultValue={props.value}
         onChange={(e) =>
           props.setStockInput((stock) => ({
             ...stock,
             [label]: e.target.value,
           }))
         }
+        disabled={props.disabled}
       />
     </div>
   );

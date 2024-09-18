@@ -1,2 +1,10 @@
 @import "variables";
 @import "atoms/atoms";
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: #C1A360;
+}

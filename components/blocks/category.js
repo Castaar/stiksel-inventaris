@@ -8,7 +8,7 @@ const category = (props) => {
   return (
     <div
       className={styles["category"]}
-      onClick={() => router.push(`/products/${props.title}`)}
+      onClick={() => router.push(`/products/${props.slug}/${props.title}`)}
     >
       <p className={styles["category-title"]}>{props.title}</p>
     </div>

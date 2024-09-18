@@ -12,7 +12,7 @@ export default function categories(props) {
       <Title value={"Stock"} url={"/"} />
       <div className="main-list">
         {props.collections.map((collection, index) => {
-          return <Category key={index} title={collection.name} />;
+          return <Category key={index} title={collection.name} slug="stock"/>;
         })}
       </div>
     </main>
@@ -25,6 +25,7 @@ export async function getServerSideProps() {
     const db = client.db("stock");
 
     const collections = await db.listCollections().toArray();
+    collections.sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       props: { collections: JSON.parse(JSON.stringify(collections)) },
