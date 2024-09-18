@@ -6,13 +6,20 @@ import clientPromise from "../../lib/mongodb";
 import Title from "../../components/base/title";
 import Category from "../../components/blocks/category";
 
+import Link from "next/link";
+
 export default function categories(props) {
   return (
     <main className="main">
-      <Title value={"Borden"} url={"/"} />
+      <div className="title-block">
+        <Title value={"Borden"} url={"/"} />
+        <Link href="/borden-aanvullen">
+          <div className="btn-secondary cross">Aanvullen</div>
+        </Link>
+      </div>
       <div className="main-list">
         {props.collections.map((collection, index) => {
-          return <Category key={index} title={collection.name} slug="borden"/>;
+          return <Category key={index} title={collection.name} slug="borden" />;
         })}
       </div>
     </main>

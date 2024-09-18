@@ -8,26 +8,47 @@ import CategoryTitle from "../../../components/blocks/category-title";
 import Search from "../../../components/base/search";
 import Product from "../../../components/blocks/product";
 
+import Link from "next/link";
+
 export default function category(props) {
   const [searchInput, setSearchInput] = useState();
 
   return (
     <main className="main">
       <div>
-        <Title value={"Borden producten"} url={"/borden"} />
-        <div className="main-heading">
-          <CategoryTitle />
-          <Search setSearchInput={setSearchInput} />
+        <div className="title-block">
+          <Link href="/borden">
+            <div className="btn-secondary arrow-left">Terug</div>
+          </Link>
+          <Title value={`${props.slug}.`} url={"/borden"} />
         </div>
       </div>
+      {
+        props.products.length !== 0 &&
+        <div className="search-container">
+          <div className="search-block">
+            <Search setSearchInput={setSearchInput} />
+          </div>
+        </div>
+      }
       <div className="main-scroll">
-        <Product
-          name={"Omschrijving:"}
-          format={"Formaat:"}
-          number={"Productnummer:"}
-          available={"Aantal m / stuks beschikbaar:"}
-          edit={false}
-        />
+        {
+          props.products.length === 0 ?
+            <div className="no-products-found">
+              <h2>Geen producten gevonden</h2>
+              <Link href={`/stock-aanvullen?product=${props.slug}`}>
+                <div className="btn-secondary cross">Aanvullen</div>
+              </Link>
+            </div>
+            :
+            <Product
+              name={"Omschrijving:"}
+              format={"Dikte:"}
+              number={"Productnummer:"}
+              available={"Aantal m / stuks beschikbaar:"}
+              edit={false}
+            />
+        }
         {props.products
           .filter((product) => {
             let productName = product.name?.toLowerCase();
@@ -73,7 +94,7 @@ export async function getServerSideProps({ query }) {
     }
 
     return {
-      props: { products: JSON.parse(JSON.stringify(allItems)) },
+      props: { products: JSON.parse(JSON.stringify(allItems)), slug: query.slug },
     };
   } catch (e) {
     return { props: { error: JSON.parse(JSON.stringify(e)) } };

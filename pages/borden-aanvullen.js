@@ -6,19 +6,30 @@ import ProductAdd from "../components/blocks/product-add";
 
 import { toast } from "react-hot-toast";
 
+import Link from "next/link";
+import { useRouter } from 'next/router';
+
 export default function Categories(props) {
+
+  const router = useRouter();
+  const { product } = router.query;
+
   return (
     <main className="main">
-      <div>
-        <Title value={"Borden aanvullen"} url={"/borden"} />
-        <ProductAdd
-          collections={props.collections}
-          products={props.products}
-          db_name="borden"
-          slug="borden"
-          toast={toast}
-        />
+      <div className="title-block">
+        <Link href="/borden">
+          <div className="btn-secondary arrow-left">Terug</div>
+        </Link>
+        <Title value="Borden aanvullen." url={"/borden"} />
       </div>
+      <ProductAdd
+        selectedOption={product ? product : "Selecteer"}
+        collections={props.collections}
+        products={props.products}
+        db_name="borden"
+        slug="borden"
+        toast={toast}
+      />
     </main>
   );
 }

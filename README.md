@@ -39,3 +39,8 @@ mongodump --uri "mongodb+srv://<username>:<password>@<clustername>/<db_name>" --
 
 # Import new database
 mongorestore --uri "mongodb+srv://<username>:<password>@<clustername>" --db new_db_name /path/to/your/folder/db_name
+
+# Github
+git add .
+git commit -m "description"
+git push origin master

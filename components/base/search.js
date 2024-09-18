@@ -9,7 +9,7 @@ const search = ({ setSearchInput, productSearchInfo }) => {
     <div className={styles["category"]}>
       <input
         className={styles["category-search"]}
-        placeholder="Search"
+        placeholder="Zoek op omschrijving"
         onChange={(e) => setSearchInput(e.target.value)}
         defaultValue={router.query?.product}
       />

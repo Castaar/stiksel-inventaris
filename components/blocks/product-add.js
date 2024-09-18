@@ -1,4 +1,3 @@
-// components/blocks/Dropdowns.js
 'use client';
 
 import React, { useState } from 'react';
@@ -6,12 +5,13 @@ import { useRouter } from 'next/router';
 
 import styles from "../../styles/blocks/_product-add.module.scss";
 
-export default function Dropdowns({ collections, products, db_name, toast, slug }) {
+export default function Dropdowns({ collections, products, db_name, toast, slug, selectedOption }) {
   const router = useRouter();
 
-  const [selectedCollection, setSelectedCollection] = useState(router.query.collection || 'Selecteer');
-  const [selectedProduct, setSelectedProduct] = useState(router.query.state || 'Selecteer');
+  console.log("selectedOption", selectedOption);
 
+  const [selectedCollection, setSelectedCollection] = useState(router.query.collection || selectedOption || 'Selecteer');
+  const [selectedProduct, setSelectedProduct] = useState(router.query.state || 'Selecteer');
   const [stockInput, setStockInput] = useState({});
 
   const handleCollectionChange = (newCollection) => {
@@ -44,7 +44,7 @@ export default function Dropdowns({ collections, products, db_name, toast, slug 
         format: stockInput.format ? stockInput.format : '',
         price: stockInput.price || 0,
         unit: stockInput.unit || '',
-        available: stockInput.available || 0
+        available: stockInput.available || 0,
       };
     } else {
       const productOld = products.find(product => product._id === selectedProduct);
@@ -65,7 +65,6 @@ export default function Dropdowns({ collections, products, db_name, toast, slug 
     }
 
     try {
-      console.log(data)
       await fetch(
         `/api/add-${db_name}?collection=${selectedCollection}`,
         {
@@ -100,11 +99,11 @@ export default function Dropdowns({ collections, products, db_name, toast, slug 
             id="collection"
             className={styles["category-search"]}
             onChange={(e) => handleCollectionChange(e.target.value)}
-            value={selectedCollection}
+            value={selectedCollection} // This will set the selected option
           >
             <option value="Selecteer">Selecteer</option>
             {collections.map((collection, index) => (
-              <option key={index} value={collection.name}>
+              <option key={index} value={collection.name} selected={collection.name === selectedOption}>
                 {collection.name}
               </option>
             ))}
@@ -136,105 +135,105 @@ export default function Dropdowns({ collections, products, db_name, toast, slug 
         <>
           {selectedProduct === 'new' ? (
             <>
-            <div className="main-list-stock">
-              <div className={styles["category"]}>
-                <input
-                  className={styles["category-search"]}
-                  placeholder="Omschrijving"
-                  required
-                  onChange={(e) =>
-                    setStockInput((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
-                />
+              <div className="main-list-stock">
+                <div className={styles["category"]}>
+                  <input
+                    className={styles["category-search"]}
+                    placeholder="Omschrijving"
+                    required
+                    onChange={(e) =>
+                      setStockInput((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className={styles["category"]}>
+                  <input
+                    className={styles["category-search"]}
+                    placeholder={db_name === "stock" ? "Formaat cm" : db_name === "borden" ? "Dikte cm" : "Formaat"}
+                    required
+                    onChange={(e) =>
+                      setStockInput((prev) => ({
+                        ...prev,
+                        format: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className={styles["category"]}>
+                  <select
+                    className={styles["category-search"]}
+                    onChange={(e) => {
+                      setStockInput((prev) => ({
+                        ...prev,
+                        unit: e.target.value,
+                      }));
+                    }}
+                  >
+                    <option value="">eenheid</option>
+                    <option value="stuks">stuks</option>
+                    <option value="m">m</option>
+                  </select>
+                </div>
+                <div className={styles["category"]}>
+                  <input
+                    className={styles["category-search"]}
+                    placeholder="Prijs"
+                    type="number"
+                    onChange={(e) =>
+                      setStockInput((prev) => ({
+                        ...prev,
+                        price: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
+                <div className={styles["category"]}>
+                  <input
+                    className={styles["category-search"]}
+                    placeholder="Aantal m / stuks"
+                    type="number"
+                    required
+                    onChange={(e) =>
+                      setStockInput((prev) => ({
+                        ...prev,
+                        available: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
               </div>
-              <div className={styles["category"]}>
-                <input
-                  className={styles["category-search"]}
-                  placeholder={db_name === "stock" ? "Formaat cm" : db_name === "borden" ? "Dikte cm" : "Formaat"}
-                  required
-                  onChange={(e) =>
-                    setStockInput((prev) => ({
-                      ...prev,
-                      format: e.target.value,
-                    }))
-                  }
-                />
+              <div className="btn-wrapper">
+                <button className="btn" onClick={saveToMongo}>
+                  Bewaar
+                </button>
               </div>
-              <div className={styles["category"]}>
-                <select
-                  className={styles["category-search"]}
-                  onChange={(e) => {
-                    setStockInput((prev) => ({
-                      ...prev,
-                      unit: e.target.value,
-                    }));
-                  }}
-                >
-                  <option value="">eenheid</option>
-                  <option value="stuks">stuks</option>
-                  <option value="m">m</option>
-                </select>
-              </div>
-              <div className={styles["category"]}>
-                <input
-                  className={styles["category-search"]}
-                  placeholder="Prijs"
-                  type="number"
-                  onChange={(e) =>
-                    setStockInput((prev) => ({
-                      ...prev,
-                      price: Number(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-              <div className={styles["category"]}>
-                <input
-                  className={styles["category-search"]}
-                  placeholder="Aantal m / stuks"
-                  type="number"
-                  required
-                  onChange={(e) =>
-                    setStockInput((prev) => ({
-                      ...prev,
-                      available: Number(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="btn-wrapper">
-              <button className="btn" onClick={saveToMongo}>
-                Bewaar
-              </button>
-            </div>
-          </>
+            </>
           ) : (
             <>
-            <div className="main-list-stock">
-              <div className={styles["category"]}>
-                <input
-                  className={styles["category-search"]}
-                  placeholder="Aantal m / stuks"
-                  type="number"
-                  required
-                  onChange={(e) =>
-                    setStockInput((prev) => ({
-                      ...prev,
-                      available: Number(e.target.value),
-                    }))
-                  }
-                />
+              <div className="main-list-stock">
+                <div className={styles["category"]}>
+                  <input
+                    className={styles["category-search"]}
+                    placeholder="Aantal m / stuks"
+                    type="number"
+                    required
+                    onChange={(e) =>
+                      setStockInput((prev) => ({
+                        ...prev,
+                        available: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
               </div>
-            </div>
-            <div className="btn-wrapper">
-              <button className="btn" onClick={saveToMongo}>
-                Bewaar
-              </button>
-            </div>
+              <div className="btn-wrapper">
+                <button className="btn" onClick={saveToMongo}>
+                  Bewaar
+                </button>
+              </div>
             </>
           )}
         </>

@@ -1,4 +1,6 @@
 import Head from "next/head";
+import Image from 'next/image';
+
 import "../styles/globals.scss";
 import Link from "next/link";
 import { useState } from "react";
@@ -43,7 +45,14 @@ export default function myApp({ Component, pageProps }) {
         <meta name="theme-color" content="#317EFB" />
       </Head>
       <header className="header">
-        <a href="/">Castaar</a>
+        <a href="/">
+          <Image
+            src="/images/logo-castaar.svg"
+            alt="Logo Castaar"
+            width={230}
+            height={34}
+          />
+        </a>
         <span onClick={handleToggleNav}>
           <svg
             id="icon_menu"
@@ -67,20 +76,11 @@ export default function myApp({ Component, pageProps }) {
           <Link href="/" onClick={handleToggleNav}>
             Home
           </Link>
-          {/* <Link href="/stock-verminderen" onClick={handleToggleNav}>
-            Stock verminderen
-          </Link> */}
           <Link href="/stock" onClick={handleToggleNav}>
             Stock
           </Link>
           <Link href="/borden" onClick={handleToggleNav}>
             Borden
-          </Link>
-          <Link href="/stock-aanvullen" onClick={handleToggleNav}>
-            Stock aanvullen
-          </Link>
-          <Link href="/borden-aanvullen" onClick={handleToggleNav}>
-            Borden aanvullen
           </Link>
         </nav>
       )}

@@ -8,3 +8,11 @@ a {
 a:hover {
     color: #C1A360;
 }
+
+a img {
+    pointer-events: none;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
