@@ -23,12 +23,6 @@ export default function home(props) {
           <Link href="/borden">
             Borden
           </Link>
-          <Link href="/stock-aanvullen">
-            Stock aanvullen
-          </Link>
-          <Link href="/borden-aanvullen">
-            Borden aanvullen
-          </Link>
         </div>
         <InfoBlock
           value={`€ ${props.stock.price.total}`}
