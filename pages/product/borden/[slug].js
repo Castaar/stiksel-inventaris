@@ -104,6 +104,7 @@ export default function category({ product }) {
           input="text"
           value={product?.name} 
           label={"Naam"}
+          db_key={"Naam"}
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
@@ -112,7 +113,8 @@ export default function category({ product }) {
         <ProductItem
           input="text"
           value={product?.thickness} 
-          label={"Thickness"}
+          label={"Dikte"}
+          db_key={"Thickness"}
           stockInput={stockInput}
           setStockInput={setStockInput} 
           disabled={false}
@@ -122,6 +124,7 @@ export default function category({ product }) {
           input="text"
           value={product?._id} 
           label={"Artikelnr"}
+          db_key={"Artikelnr"}
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={true}
@@ -131,6 +134,7 @@ export default function category({ product }) {
           input="number"
           value={product?.available}
           label={"Beschikbaar"}
+          db_key={"Beschikbaar"}
           unit={product?.unit}
           stockInput={stockInput}
           setStockInput={setStockInput}

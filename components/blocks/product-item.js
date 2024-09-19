@@ -9,7 +9,7 @@ const productItem = (props) => {
 
   return (
     <div className={styles["product"]}>
-      <label>{props.label} {`${props.unit ? "(M)" : ""}`}:</label>
+      <label>{label} {`${props.unit ? "(M)" : ""}`}:</label>
       <input
         type={props.input}
         className={styles["product-item"]}
@@ -18,7 +18,7 @@ const productItem = (props) => {
         onChange={(e) =>
           props.setStockInput((stock) => ({
             ...stock,
-            [label]: e.target.value,
+            [props.db_key]: e.target.value,
           }))
         }
         disabled={props.disabled}

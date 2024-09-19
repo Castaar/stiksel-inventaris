@@ -24,9 +24,6 @@ export default async (req, res) => {
 
     const docId = { _id: objectId };
 
-    console.log('req.body');
-    console.log(req.body);
-
     // Validate request body
     const { name, available, thickness } = req.body;
     // if (!name || available === undefined) {
