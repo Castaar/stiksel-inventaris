@@ -11,8 +11,6 @@ const product = (props) => {
 
   const unitCheck = props.unit === "stuks";
 
-  console.log(props);
-
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>

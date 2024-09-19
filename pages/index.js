@@ -48,9 +48,6 @@ export async function getServerSideProps({ query }) {
     const totalPriceStock = await calculateTotalPriceForDB('stock');
     const totalPriceBorden = await calculateTotalPriceForDB('borden');
 
-    console.log(totalPriceStock)
-    console.log(totalPriceBorden)
-
     return {
       props: {
         stock: {

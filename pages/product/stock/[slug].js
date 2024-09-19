@@ -65,7 +65,6 @@ export default function category({ product }) {
     };
 
     try {
-      console.log(data)
       fetch(
         `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
           process.env.NEXT_PUBLIC_API

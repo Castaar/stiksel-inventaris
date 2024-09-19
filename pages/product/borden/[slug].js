@@ -57,9 +57,6 @@ export default function category({ product }) {
   // add data to MongoDB
   const updateToMongo = async () => {
 
-    console.log(stockInput)
-    console.log(stockInput.Thickness)
-
     let data = {
       name: stockInput.Naam,
       available: Number(stockInput.Beschikbaar),
