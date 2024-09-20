@@ -28,7 +28,7 @@ const product = (props) => {
         {
           props.thickness && 
           <>
-            <span className={styles["product-label"]}>Dikte: </span>
+            <span className={styles["product-label"]}>Dikte mm: </span>
             {props?.thickness}
           </>
         }

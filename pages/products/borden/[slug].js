@@ -43,7 +43,7 @@ export default function category(props) {
             :
             <Product
               name={"Omschrijving:"}
-              format={"Dikte:"}
+              format={"Dikte mm:"}
               number={"Productnummer:"}
               available={"Aantal m / stuks beschikbaar:"}
               edit={false}
