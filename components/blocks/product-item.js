@@ -9,7 +9,7 @@ const productItem = (props) => {
 
   return (
     <div className={styles["product"]}>
-      <label>{label} {`${props.unit ? "(M)" : ""}`}:</label>
+      <label>{label} {`${props.unit ? "(M)" : label === "Dikte" ? "(mm)" : ""}`}:</label>
       <input
         type={props.input}
         className={styles["product-item"]}
