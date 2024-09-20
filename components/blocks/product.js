@@ -5,10 +5,6 @@ import styles from "../../styles/blocks/_product.module.scss";
 const product = (props) => {
   const router = useRouter();
 
-  // function cmToMeters(cm) {
-  //   return cm / 100;
-  // }
-
   const unitCheck = props.unit === "stuks";
 
   return (

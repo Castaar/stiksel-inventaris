@@ -150,7 +150,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                 <div className={styles["category"]}>
                   <input
                     className={styles["category-search"]}
-                    placeholder="Dikte cm"
+                    placeholder="Dikte mm"
                     required
                     onChange={(e) =>
                       setStockInput((prev) => ({

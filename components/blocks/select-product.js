@@ -5,10 +5,6 @@ import styles from "../../styles/blocks/_product.module.scss";
 const selectProduct = (props) => {
   const router = useRouter();
 
-  // function cmToMeters(cm) {
-  //   return cm / 100;
-  // }
-
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>{props.name}</p>
