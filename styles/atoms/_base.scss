@@ -298,3 +298,47 @@ a {
 .mt-40 {
   margin-top: 40px;
 }
+
+.btn-secondary.download::after {
+  content: '';
+  display: inline-block;
+  background-color: white;
+  mask-image: url('/images/arrow-down.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  margin-left: 10px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-secondary.download:hover::after {
+  transform: translateX(0px);
+  background-color: #C1A360;
+}
+
+.btn-secondary.arrow-left.download::before {
+  content: '';
+  display: inline-block;
+  background-color: white;
+  mask-image: url('/images/arrow-left.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-secondary.arrow-left.download::after {
+  content: '';
+  display: inline-block;
+  background-color: white;
+  mask-image: url('/images/arrow-down.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  margin-left: 10px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
