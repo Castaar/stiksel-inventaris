@@ -101,7 +101,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
           >
             <option value="Selecteer">Selecteer</option>
             {collections.map((collection, index) => (
-              <option key={index} value={collection.name} selected={collection.name === selectedOption}>
+              <option key={index} value={collection.name}>
                 {collection.name}
               </option>
             ))}

@@ -10,8 +10,12 @@ import Product from "../../../components/blocks/product";
 
 import Link from "next/link";
 
+import styles from "../../../styles/blocks/_product.module.scss";
+
 export default function category(props) {
   const [searchInput, setSearchInput] = useState();
+
+  console.log(props)
 
   return (
     <main className="main">
@@ -32,6 +36,7 @@ export default function category(props) {
         </div>
       }
       <div className="main-scroll">
+       
         {
           props.products.length === 0 ?
             <div className="no-products-found">
@@ -42,10 +47,10 @@ export default function category(props) {
             </div>
             :
             <Product
-              name={"Omschrijving:"}
+              name={"Naam:"}
               format={"Dikte (mm):"}
               number={"Productnummer:"}
-              available={"Aantal m / stuks beschikbaar:"}
+              available={"Beschikbaar (m):"}
               edit={false}
             />
         }

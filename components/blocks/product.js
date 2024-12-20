@@ -9,26 +9,12 @@ const product = (props) => {
 
   return (
     <div className={styles["product"]}>
-      <p className={styles["product-title"]}>
-        <span className={styles["product-label"]}>Naam: </span>
-        {props?.name}
-      </p>
-      <p className={styles["product-title"]}>
-        <span className={styles["product-label"]}>Voorraad: </span>
-        {props.available}
-      </p>
-      <p className={styles["product-title"]}>
-        {
-          props.format &&
-          <>
-            <span className={styles["product-label"]}>Formaat: </span>
-            {props?.format}
-          </>
-        }
+      <p className={styles["product-title"]}>{ props?.name }</p>
+      <p className={styles["product-title"]}>{ props.available }</p>
+      <p className={styles["product-title"]}>{ props?.format }
         {
           props.thickness && 
           <>
-            <span className={styles["product-label"]}>{`Dikte (mm):`} </span>
             {props?.thickness}
           </>
         }
