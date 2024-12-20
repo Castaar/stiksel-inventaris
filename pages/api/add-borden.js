@@ -77,11 +77,19 @@ export default async function handler(req, res) {
       }
 
       const newProduct = {
-        name,
+        name: name || '',
         unit: unit || '',
-        available,
-        thickness: thickness || '',
-        price: price || 0,
+        format: format || '',
+        calculation_type: null, // "bord" || "stuk" || "rol_per_meter" || "rol_per_square_meter" || "total_rol_per_meter"
+        width_cm: Number(width_cm) || 0,
+        height_cm: Number(height_cm) || 0,
+        depth_cm: Number(depth_cm) || 0,
+        available: Number(available) || 0,
+        thickness: Number(thickness) || 0,
+        price_per_square_meter: Number(price_per_square_meter) || 0,
+        price_per_piece: Number(price_per_piece) || 0,
+        price_per_meter: Number(price_per_meter) || 0,
+        total_meter_per_rol: Number(total_meter_per_rol) || 0
       };
 
       const insertResult = await collection.insertOne(newProduct);
