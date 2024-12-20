@@ -44,7 +44,7 @@ export default function category({ product }) {
           toast.success(`Product is verwijderd`);
           router.push(`/products/stock/${router.query?.cat}`);
         } else {
-          toast.error(`'t Spel es kapot!`);
+          toast.error(`'t Spel es kapot`);
         }
 
       });
