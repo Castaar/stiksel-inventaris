@@ -60,7 +60,7 @@ export default function category({ product }) {
     let data = {
       name: stockInput.Naam,
       available: Number(stockInput.Beschikbaar),
-      thickness: stockInput.Thickness,
+      thickness: Number(stockInput.Thickness),
       _id: product._id,
     };
 
@@ -108,7 +108,7 @@ export default function category({ product }) {
           placeholder="Vul een naam in"
         />
         <ProductItem
-          input="text"
+          input="number"
           value={product?.thickness} 
           label={"Dikte"}
           db_key={"Thickness"}
