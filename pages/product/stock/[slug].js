@@ -97,7 +97,7 @@ export default function category({ product }) {
       </div>
       <div className="main-detail">
 
-        unit: unit || '',
+        {/* unit: unit || '',
         format: format || '',
         calculation_type: null, // "bord" || "stuk" || "rol_per_meter" || "rol_per_square_meter" || "total_rol_per_meter"
         width_cm: Number(width_cm) || 0,
@@ -108,7 +108,7 @@ export default function category({ product }) {
         price_per_square_meter: Number(price_per_square_meter) || 0,
         price_per_piece: Number(price_per_piece) || 0,
         price_per_meter: Number(price_per_meter) || 0,
-        total_meter_per_rol:
+        total_meter_per_rol: */}
 
         <ProductItem
           input="text"
