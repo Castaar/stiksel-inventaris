@@ -107,6 +107,10 @@ export async function getServerSideProps({ query }) {
       props: { products: JSON.parse(JSON.stringify(allItems)), slug: query.slug },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (products/borden/[slug]):', e);
+    // Return empty array to prevent crashes
+    return {
+      props: { products: [], slug: query.slug || 'unknown' },
+    };
   }
 }

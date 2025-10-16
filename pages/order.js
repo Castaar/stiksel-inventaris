@@ -65,6 +65,10 @@ export async function getServerSideProps({ query }) {
       },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (order):', e);
+    // Return empty object to prevent crashes
+    return {
+      props: {},
+    };
   }
 }

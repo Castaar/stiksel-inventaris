@@ -38,6 +38,10 @@ export async function getServerSideProps() {
       props: { collections: JSON.parse(JSON.stringify(collections)) },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (borden/index):', e);
+    // Return empty array to prevent crashes
+    return {
+      props: { collections: [] },
+    };
   }
 }

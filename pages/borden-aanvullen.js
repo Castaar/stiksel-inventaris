@@ -55,6 +55,13 @@ export async function getServerSideProps({ query }) {
       },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (borden-aanvullen):', e);
+    // Return empty arrays to prevent crashes
+    return {
+      props: {
+        collections: [],
+        products: [],
+      },
+    };
   }
 }

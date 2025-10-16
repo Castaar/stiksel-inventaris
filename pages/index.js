@@ -118,7 +118,22 @@ export async function getServerSideProps({ query }) {
       },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (index):', e);
+    // Return default structure to prevent crashes
+    return {
+      props: {
+        stock: {
+          price: {
+            total: 0
+          }
+        },
+        borden: {
+          price: {
+            total: 0
+          }
+        }
+      },
+    };
   }
 }
 

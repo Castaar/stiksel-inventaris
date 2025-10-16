@@ -160,7 +160,7 @@ export async function getServerSideProps({ query }) {
     try {
       objectId = ObjectId.createFromHexString(query.slug)
     } catch (error) {
-      console.log("Invalid ObjectId");
+      console.error("Invalid ObjectId:", error);
       return { props: { product: null } };
     }
 
@@ -170,6 +170,8 @@ export async function getServerSideProps({ query }) {
       props: { product: JSON.parse(JSON.stringify(document)) },
     };
   } catch (e) {
-    return { props: { error: JSON.parse(JSON.stringify(e)) } };
+    console.error('Error in getServerSideProps (product/borden/[slug]):', e);
+    // Return null product to prevent crashes
+    return { props: { product: null } };
   }
 }
