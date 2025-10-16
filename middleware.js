@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 
 // Add your whitelisted IP addresses here
 const WHITELISTED_IPS = [
-  '213.214.40.251', // Office IP
+  '213.214.40.251', // CASTAAR IP
+  '94.224.96.186', // STIKSEL IP
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
 ];
