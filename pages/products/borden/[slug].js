@@ -21,9 +21,14 @@ export default function category(props) {
     <main className="main">
       <div>
         <div className="title-block">
-          <Link href="/borden">
-            <div className="btn-secondary arrow-left">Terug</div>
-          </Link>
+          <div className="title-block-links">
+            <Link href="/borden">
+              <div className="btn-secondary arrow-left">Terug</div>
+            </Link>
+            <Link href="/borden-aanvullen">
+              <div className="btn-secondary cross">Aanvullen</div>
+            </Link>
+          </div>
           <Title value={`${props.slug}.`} url={"/borden"} />
         </div>
       </div>
