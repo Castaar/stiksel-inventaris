@@ -57,6 +57,7 @@ export async function getServerSideProps() {
 
     const collections = await db.listCollections().toArray();
     console.log('[Borden] Collections fetched:', collections.length);
+    console.log('[Borden] Collection structure:', JSON.stringify(collections[0])); // Log first collection
     
     if (collections.length === 0) {
       console.warn('[Borden] WARNING: No collections found in database!');
@@ -64,14 +65,30 @@ export async function getServerSideProps() {
     
     collections.sort((a, b) => a.name.localeCompare(b.name));
 
+    // Serialize collections properly
+    const serializedCollections = collections.map(col => ({
+      name: col.name,
+      type: col.type || 'collection'
+    }));
+    
+    console.log('[Borden] Serialized collections:', serializedCollections.length);
+    console.log('[Borden] First serialized:', JSON.stringify(serializedCollections[0]));
+
     return {
-      props: { collections: JSON.parse(JSON.stringify(collections)) },
+      props: { 
+        collections: serializedCollections
+      },
     };
   } catch (e) {
     console.error('[Borden] Error in getServerSideProps:', e.message);
     console.error('[Borden] Full error:', e);
     
-    // Don't return empty array - let the error be visible
-    throw new Error(`Failed to load collections: ${e.message}`);
+    // Return empty array with error flag
+    return {
+      props: { 
+        collections: [],
+        error: e.message 
+      },
+    };
   }
 }
