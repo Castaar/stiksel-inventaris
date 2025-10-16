@@ -39,20 +39,36 @@ export default function categories(props) {
 
 export async function getServerSideProps() {
   try {
+    console.log('[Stock] Starting getServerSideProps...');
+    
+    // Ensure MongoDB connection is established
     const client = await clientPromise;
+    console.log('[Stock] MongoDB client connected');
+    
+    // Wait for connection to be ready
+    await client.connect();
+    console.log('[Stock] MongoDB connection established');
+    
     const db = client.db("stock");
+    console.log('[Stock] Database selected');
 
     const collections = await db.listCollections().toArray();
+    console.log('[Stock] Collections fetched:', collections.length);
+    
+    if (collections.length === 0) {
+      console.warn('[Stock] WARNING: No collections found in database!');
+    }
+    
     collections.sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       props: { collections: JSON.parse(JSON.stringify(collections)) },
     };
   } catch (e) {
-    console.error('Error in getServerSideProps (stock/index):', e);
-    // Return empty array to prevent crashes
-    return {
-      props: { collections: [] },
-    };
+    console.error('[Stock] Error in getServerSideProps:', e.message);
+    console.error('[Stock] Full error:', e);
+    
+    // Don't return empty array - let the error be visible
+    throw new Error(`Failed to load collections: ${e.message}`);
   }
 }
