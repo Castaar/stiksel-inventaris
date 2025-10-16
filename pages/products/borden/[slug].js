@@ -14,8 +14,8 @@ import styles from "../../../styles/blocks/_product.module.scss";
 
 export default function category(props) {
   const [searchInput, setSearchInput] = useState();
-
-  console.log(props)
+  const products = props.products || [];
+  const slug = props.slug || '';
 
   return (
     <main className="main">
@@ -29,11 +29,11 @@ export default function category(props) {
               <div className="btn-secondary cross">Aanvullen</div>
             </Link>
           </div>
-          <Title value={`${props.slug}.`} url={"/borden"} />
+          <Title value={`${slug}.`} url={"/borden"} />
         </div>
       </div>
       {
-        props.products.length !== 0 &&
+        products.length !== 0 &&
         <div className="search-container">
           <div className="search-block">
             <Search setSearchInput={setSearchInput} />
@@ -43,10 +43,10 @@ export default function category(props) {
       <div className="main-scroll">
        
         {
-          props.products.length === 0 ?
+          products.length === 0 ?
             <div className="no-products-found">
               <h2>Geen producten gevonden</h2>
-              <Link href={`/borden-aanvullen?product=${props.slug}`}>
+              <Link href={`/borden-aanvullen?product=${slug}`}>
                 <div className="btn-secondary cross">Aanvullen</div>
               </Link>
             </div>
@@ -59,7 +59,7 @@ export default function category(props) {
               edit={false}
             />
         }
-        {props.products
+        {products
           .filter((product) => {
             let productName = product.name?.toLowerCase();
             if (searchInput) {

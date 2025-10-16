@@ -12,6 +12,9 @@ import Link from "next/link";
 
 export default function category(props) {
   const [searchInput, setSearchInput] = useState();
+  const products = props.products || [];
+  const slug = props.slug || '';
+  
   return (
     <main className="main">
       <div>
@@ -24,11 +27,11 @@ export default function category(props) {
               <div className="btn-secondary cross">Aanvullen</div>
             </Link>
           </div>
-          <Title value={`${props.slug}.`} url={"/stock"} />
+          <Title value={`${slug}.`} url={"/stock"} />
         </div>        
       </div>
       {
-        props.products.length !== 0 &&
+        products.length !== 0 &&
         <div className="search-container">
           <div className="search-block">
             <Search setSearchInput={setSearchInput} />
@@ -37,10 +40,10 @@ export default function category(props) {
       }
       <div className="main-scroll">
         {
-          props.products.length === 0 ?
+          products.length === 0 ?
             <div className="no-products-found">
               <h2>Geen producten gevonden</h2>
-              <Link href={`/stock-aanvullen?product=${props.slug}`}>
+              <Link href={`/stock-aanvullen?product=${slug}`}>
                 <div className="btn-secondary cross">Aanvullen</div>
               </Link>
             </div>
@@ -53,7 +56,7 @@ export default function category(props) {
               edit={false}
             />
         }
-        {props.products
+        {products
           .filter((product) => {
             let productName = product.name?.toLowerCase();
             if (searchInput) {

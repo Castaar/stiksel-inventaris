@@ -9,6 +9,8 @@ import Category from "../../components/blocks/category";
 import Link from "next/link";
 
 export default function categories(props) {
+  const collections = props.collections || [];
+  
   return (
     <main className="main">
       <div className="title-block">
@@ -18,9 +20,18 @@ export default function categories(props) {
         </Link>
       </div>
       <div className="main-list">
-        {props.collections.map((collection, index) => {
-          return <Category key={index} title={collection.name} slug="stock"/>;
-        })}
+        {collections.length === 0 ? (
+          <div className="no-products-found">
+            <h2>Geen categorieën gevonden</h2>
+            <Link href="/stock-aanvullen">
+              <div className="btn-secondary cross">Aanvullen</div>
+            </Link>
+          </div>
+        ) : (
+          collections.map((collection, index) => {
+            return <Category key={index} title={collection.name} slug="stock"/>;
+          })
+        )}
       </div>
     </main>
   );
