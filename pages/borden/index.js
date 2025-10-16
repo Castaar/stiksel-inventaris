@@ -11,6 +11,9 @@ import Link from "next/link";
 export default function categories(props) {
   const collections = props.collections || [];
   
+  // Debug: log what we're receiving
+  console.log('Borden collections received:', collections);
+  
   return (
     <main className="main">
       <div className="title-block">
@@ -43,6 +46,10 @@ export async function getServerSideProps() {
     const db = client.db("borden");
 
     const collections = await db.listCollections().toArray();
+    
+    // Debug: log what we're getting from the database
+    console.log('Borden - Collections from DB:', collections.length, 'collections');
+    
     collections.sort((a, b) => a.name.localeCompare(b.name));
 
     return {
