@@ -4,11 +4,13 @@ import Image from 'next/image';
 import "../styles/globals.scss";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 import { Toaster } from "react-hot-toast";
 
 export default function myApp({ Component, pageProps }) {
   const [navActive, setNavActive] = useState(false);
+  const router = useRouter();
 
   const handleToggleNav = () => {
     setNavActive(!navActive);
@@ -84,7 +86,7 @@ export default function myApp({ Component, pageProps }) {
           </Link>
         </nav>
       )}
-      <Component {...pageProps} />
+      <Component {...pageProps} key={router.asPath} />
     </>
   );
 }
