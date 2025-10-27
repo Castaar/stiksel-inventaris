@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 // DB connect
 import clientPromise from "../../lib/mongodb";
@@ -9,17 +10,21 @@ import Category from "../../components/blocks/category";
 import Link from "next/link";
 
 export default function categories(props) {
+  const router = useRouter();
+  const [collections, setCollections] = useState(props.collections || []);
+  
+  // Update collections when props change
+  useEffect(() => {
+    console.log('[Stock Client] Props updated:', props);
+    if (Array.isArray(props.collections)) {
+      setCollections(props.collections);
+    }
+  }, [props.collections]);
+  
   // Debug: log what props we're receiving
   console.log('[Stock Client] All props:', props);
   console.log('[Stock Client] props.collections:', props.collections);
-  
-  // Ensure collections is always an array
-  const collections = Array.isArray(props.collections) ? props.collections : [];
-  
-  // Debug: log what we're receiving
-  console.log('Stock collections received:', collections);
-  console.log('Stock collections is array?', Array.isArray(collections));
-  console.log('Stock collections length:', collections.length);
+  console.log('[Stock Client] collections state:', collections);
   
   return (
     <main className="main">
