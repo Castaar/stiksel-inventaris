@@ -11,20 +11,43 @@ import Link from "next/link";
 
 export default function categories(props) {
   const router = useRouter();
-  const [collections, setCollections] = useState(props.collections || []);
+  
+  // Initialize with empty array if props.collections is undefined
+  const initialCollections = Array.isArray(props?.collections) ? props.collections : [];
+  const [collections, setCollections] = useState(initialCollections);
+  const [isLoading, setIsLoading] = useState(!initialCollections.length);
   
   // Update collections when props change
   useEffect(() => {
     console.log('[Stock Client] Props updated:', props);
-    if (Array.isArray(props.collections)) {
+    console.log('[Stock Client] props.collections:', props?.collections);
+    
+    if (Array.isArray(props?.collections) && props.collections.length > 0) {
       setCollections(props.collections);
+      setIsLoading(false);
+    } else if (!props?.collections) {
+      // If props.collections is undefined, force a refresh
+      console.log('[Stock Client] Collections undefined, refreshing...');
+      router.replace(router.asPath);
     }
-  }, [props.collections]);
+  }, [props?.collections, router.asPath]);
   
-  // Debug: log what props we're receiving
+  // Debug: log what we're receiving
   console.log('[Stock Client] All props:', props);
-  console.log('[Stock Client] props.collections:', props.collections);
   console.log('[Stock Client] collections state:', collections);
+  
+  if (isLoading && collections.length === 0) {
+    return (
+      <main className="main">
+        <div className="title-block">
+          <Title value={"Stock"} url={"/"} />
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <p>Laden...</p>
+        </div>
+      </main>
+    );
+  }
   
   return (
     <main className="main">
