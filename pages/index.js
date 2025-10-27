@@ -8,6 +8,10 @@ import InfoBlock from "../components/blocks/info-block";
 export default function Home(props) {
   const [isExporting, setIsExporting] = useState(false);
   const [files, setFiles] = useState([]);
+  
+  // Defensive checks for props
+  const stockTotal = props?.stock?.price?.total ?? 0;
+  const bordenTotal = props?.borden?.price?.total ?? 0;
 
   const exportDatabase = async () => {
     setIsExporting(true);
@@ -59,12 +63,12 @@ export default function Home(props) {
           <Link href="/borden">Borden</Link>
         </div>
         <InfoBlock
-          value={`€ ${props.stock.price.total}`}
+          value={`€ ${stockTotal}`}
           title={"Waarde totale stock"}
         />
         <div className="mt-40">
           <InfoBlock
-            value={`€ ${props.borden.price.total}`}
+            value={`€ ${bordenTotal}`}
             title={"Waarde totale borden"}
           />
         </div>
@@ -100,10 +104,15 @@ export default function Home(props) {
 
 export async function getServerSideProps({ query }) {
   try {
+    console.log('[Index] Starting getServerSideProps...');
+    
     const totalPriceStock = await calculateTotalPriceForDB('stock');
+    console.log('[Index] Stock total price:', totalPriceStock);
+    
     const totalPriceBorden = await calculateTotalPriceForDB('borden');
+    console.log('[Index] Borden total price:', totalPriceBorden);
 
-    return {
+    const result = {
       props: {
         stock: {
           price: {
@@ -117,8 +126,12 @@ export async function getServerSideProps({ query }) {
         }
       },
     };
+    
+    console.log('[Index] Returning props:', JSON.stringify(result.props));
+    return result;
   } catch (e) {
-    console.error('Error in getServerSideProps (index):', e);
+    console.error('[Index] Error in getServerSideProps:', e.message);
+    console.error('[Index] Full error:', e);
     // Return default structure to prevent crashes
     return {
       props: {
