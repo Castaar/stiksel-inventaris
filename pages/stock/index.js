@@ -9,7 +9,13 @@ import Category from "../../components/blocks/category";
 import Link from "next/link";
 
 export default function categories(props) {
-  const collections = props.collections || [];
+  // Ensure collections is always an array
+  const collections = Array.isArray(props.collections) ? props.collections : [];
+  
+  // Debug: log what we're receiving
+  console.log('Stock collections received:', collections);
+  console.log('Stock collections is array?', Array.isArray(collections));
+  console.log('Stock collections length:', collections.length);
   
   return (
     <main className="main">
