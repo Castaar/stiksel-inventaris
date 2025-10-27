@@ -15,7 +15,7 @@ export default function categories(props) {
   // Initialize with empty array if props.collections is undefined
   const initialCollections = Array.isArray(props?.collections) ? props.collections : [];
   const [collections, setCollections] = useState(initialCollections);
-  const [isLoading, setIsLoading] = useState(!initialCollections.length);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Update collections when props change
   useEffect(() => {
@@ -25,29 +25,18 @@ export default function categories(props) {
     if (Array.isArray(props?.collections) && props.collections.length > 0) {
       setCollections(props.collections);
       setIsLoading(false);
-    } else if (!props?.collections) {
-      // If props.collections is undefined, force a refresh
-      console.log('[Borden Client] Collections undefined, refreshing...');
-      router.replace(router.asPath);
     }
-  }, [props?.collections, router.asPath]);
+  }, [props?.collections]);
+  
+  // Manual reload function
+  const handleReload = () => {
+    setIsLoading(true);
+    router.replace(router.asPath);
+  };
   
   // Debug: log what we're receiving
   console.log('[Borden Client] All props:', props);
   console.log('[Borden Client] collections state:', collections);
-  
-  if (isLoading && collections.length === 0) {
-    return (
-      <main className="main">
-        <div className="title-block">
-          <Title value={"Borden"} url={"/"} />
-        </div>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <p>Laden...</p>
-        </div>
-      </main>
-    );
-  }
   
   return (
     <main className="main">
@@ -61,8 +50,17 @@ export default function categories(props) {
         {collections.length === 0 ? (
           <div className="no-products-found">
             <h2>Geen categorieën gevonden</h2>
+            <div style={{ marginTop: '20px' }}>
+              <button 
+                className="btn-secondary download" 
+                onClick={handleReload}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Laden...' : 'Opnieuw laden'}
+              </button>
+            </div>
             <Link href="/borden-aanvullen">
-              <div className="btn-secondary cross">Aanvullen</div>
+              <div className="btn-secondary cross" style={{ marginTop: '20px' }}>Aanvullen</div>
             </Link>
           </div>
         ) : (
