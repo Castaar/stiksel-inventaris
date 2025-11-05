@@ -13,6 +13,10 @@ export default function Dropdowns({ collections, products, toast, selectedOption
   const [selectedProduct, setSelectedProduct] = useState(router.query.state || 'Selecteer');
   const [stockInput, setStockInput] = useState({});
 
+  // Defensive checks for props
+  const safeCollections = Array.isArray(collections) ? collections : [];
+  const safeProducts = Array.isArray(products) ? products : [];
+
   // Set default price when collection changes and user selects "new product"
   useEffect(() => {
     if (selectedCollection !== 'Selecteer' && selectedProduct === 'new') {
@@ -75,7 +79,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         price_per_piece: Number(stockInput.price_per_piece) || 0,
       };
     } else {
-      const productOld = products.find(product => product._id === selectedProduct);
+      const productOld = safeProducts.find(product => product._id === selectedProduct);
       if (!productOld) {
         console.error('Product not found');
         return;
@@ -138,7 +142,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
             value={selectedCollection} // This will set the selected option
           >
             <option value="Selecteer">Selecteer</option>
-            {collections.map((collection, index) => (
+            {safeCollections.map((collection, index) => (
               <option key={index} value={collection.name}>
                 {collection.name}
               </option>
@@ -156,7 +160,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
               value={selectedProduct}
             >
               <option value="Selecteer">Selecteer</option>
-              {products.map((product, index) => (
+              {safeProducts.map((product, index) => (
                 <option key={index} value={product._id}>
                   {product.name}
                 </option>
