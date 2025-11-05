@@ -7,21 +7,25 @@ import InfoBlock from "../components/blocks/info-block";
 
 export default function Home(props) {
   const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const [files, setFiles] = useState([]);
   
   // Defensive checks for props
   const stockTotal = props?.stock?.price?.total ?? 0;
   const bordenTotal = props?.borden?.price?.total ?? 0;
 
+  // Format numbers to 2 decimal places
+  const formatPrice = (price) => {
+    return Number(price).toFixed(2);
+  };
+
   const exportDatabase = async () => {
     setIsExporting(true);
     setFiles([]); // reset files array on each export attempt
 
     try {
-      const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-      const apiUrl = `${protocol}://${process.env.NEXT_PUBLIC_API}/api/export`;
-
-      const response = await fetch(apiUrl, {
+      // Use relative URL for API calls - Next.js handles this correctly
+      const response = await fetch('/api/export', {
         method: "GET",
         headers: {
           Accept: "application/json, text/plain, */*",
@@ -50,6 +54,57 @@ export default function Home(props) {
     }
   };
 
+  const importDatabase = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Prompt for password
+    const password = prompt('Voer het wachtwoord in om de import te starten:');
+    if (!password) {
+      event.target.value = ''; // Reset file input
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('password', password);
+
+      const response = await fetch('/api/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          throw new Error('Incorrect password');
+        }
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      toast.success(`Import successful! Updated ${data.updatedCount} records.`);
+      
+      // Reset file input
+      event.target.value = '';
+      
+      // Reload page to show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message || "Import failed");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -63,12 +118,12 @@ export default function Home(props) {
           <Link href="/borden">Borden</Link>
         </div>
         <InfoBlock
-          value={`€ ${stockTotal}`}
+          value={`€ ${formatPrice(stockTotal)}`}
           title={"Waarde totale stock"}
         />
         <div className="mt-40">
           <InfoBlock
-            value={`€ ${bordenTotal}`}
+            value={`€ ${formatPrice(bordenTotal)}`}
             title={"Waarde totale borden"}
           />
         </div>
@@ -79,6 +134,22 @@ export default function Home(props) {
             <button className="btn-secondary download" onClick={exportDatabase}>
               Export
             </button>
+          )}
+        </div>
+
+        <div className="mt-20">
+          {isImporting ? (
+            <span>importing...</span>
+          ) : (
+            <label className="btn-secondary download" style={{ cursor: 'pointer' }}>
+              Import
+              <input
+                type="file"
+                accept=".xlsx"
+                onChange={importDatabase}
+                style={{ display: 'none' }}
+              />
+            </label>
           )}
         </div>
 
@@ -165,10 +236,43 @@ async function calculateTotalPriceForDB(dbName) {
       const documents = await coll.find({}).toArray();
 
       const collectionPrice = documents.reduce((sum, doc) => {
-        if (doc.price && !isNaN(doc.price)) {
-          return sum + doc.price;
+        // Calculate price based on calculation_type for accurate totals
+        let itemPrice = 0;
+
+        if (doc.calculation_type) {
+          // Calculate price dynamically based on type
+          switch (doc.calculation_type) {
+            case 'bord':
+              itemPrice = (doc.available || 0) * 
+                         ((doc.width_cm || 0) * (doc.height_cm || 0) / 10000) * 
+                         (doc.price_per_square_meter || 0);
+              break;
+            case 'stuk':
+              itemPrice = (doc.available || 0) * (doc.price_per_piece || 0);
+              break;
+            case 'rol_per_meter':
+              itemPrice = (doc.available || 0) * (doc.price_per_meter || 0);
+              break;
+            case 'rol_per_square_meter':
+              itemPrice = (doc.available || 0) * 
+                         ((doc.width_cm || 0) / 100) * 
+                         (doc.price_per_square_meter || 0);
+              break;
+            case 'total_rol_per_meter':
+              if (doc.total_meter_per_rol && doc.total_meter_per_rol > 0) {
+                itemPrice = ((doc.price_per_rol || 0) / doc.total_meter_per_rol) * 
+                           (doc.available || 0);
+              }
+              break;
+            default:
+              itemPrice = doc.price || 0;
+          }
+        } else {
+          // Fallback to stored price field if no calculation_type
+          itemPrice = doc.price || 0;
         }
-        return sum;
+
+        return sum + (isNaN(itemPrice) ? 0 : itemPrice);
       }, 0);
 
       totalPrice += collectionPrice;
@@ -177,6 +281,6 @@ async function calculateTotalPriceForDB(dbName) {
     return totalPrice;
   } catch (error) {
     console.error(`Error calculating total price for database ${dbName}:`, error);
-    return 1000000;
+    return 0;
   }
 }

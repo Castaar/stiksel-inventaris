@@ -27,9 +27,7 @@ export default function category({ product }) {
   const removeFromMongo = async () => {
     try {
       fetch(
-        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-          process.env.NEXT_PUBLIC_API
-        }/api/delete-stock?collection=${router.query?.cat}`,
+        `/api/delete-stock?collection=${router.query?.cat}`,
         {
           method: "POST",
           body: JSON.stringify(product._id),
@@ -66,9 +64,7 @@ export default function category({ product }) {
 
     try {
       fetch(
-        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-          process.env.NEXT_PUBLIC_API
-        }/api/update-stock?collection=${router.query?.cat}`,
+        `/api/update-stock?collection=${router.query?.cat}`,
         {
           method: "POST",
           body: JSON.stringify(data),

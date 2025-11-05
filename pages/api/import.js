@@ -1,0 +1,194 @@
+import clientPromise from "../../lib/mongodb";
+import { ObjectId } from "mongodb";
+import ExcelJS from "exceljs";
+import formidable from "formidable";
+import fs from "fs/promises";
+
+// Disable body parser for file upload
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    const client = await clientPromise;
+
+    // Parse the uploaded file
+    const form = formidable({});
+    const [fields, files] = await form.parse(req);
+
+    // Check password
+    const password = fields.password?.[0];
+    const correctPassword = process.env.IMPORT_PASSWORD || 'castaar2024'; // Set this in .env.local
+    
+    if (!password || password !== correctPassword) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    const uploadedFile = files.file?.[0];
+    if (!uploadedFile) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    // Read the Excel file
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(uploadedFile.filepath);
+
+    let updatedCount = 0;
+    let errorCount = 0;
+    const errors = [];
+
+    // Process each worksheet (skip the TOTALS sheet)
+    for (const worksheet of workbook.worksheets) {
+      if (worksheet.name === 'TOTALS' || worksheet.name === 'total') {
+        continue; // Skip totals sheets
+      }
+
+      // Parse database and collection name from worksheet name
+      // Format: "borden_forex_zwart" or "stock_collection_name"
+      const parts = worksheet.name.split('_');
+      if (parts.length < 2) {
+        console.log(`Skipping worksheet ${worksheet.name} - invalid format`);
+        continue;
+      }
+
+      const dbName = parts[0]; // "borden" or "stock"
+      const collectionName = parts.slice(1).join('_'); // rest is collection name
+
+      const db = client.db(dbName);
+      const collection = db.collection(collectionName);
+
+      // Get header row (row 1)
+      const headerRow = worksheet.getRow(1);
+      const headers = [];
+      headerRow.eachCell((cell, colNumber) => {
+        headers[colNumber] = cell.value;
+      });
+
+      // Find the _id column index
+      const idColumnIndex = headers.findIndex(h => h === '_id');
+      if (idColumnIndex === -1) {
+        console.log(`No _id column found in ${worksheet.name}`);
+        continue;
+      }
+
+      // Process each data row (skip header and total rows)
+      worksheet.eachRow({ includeEmpty: false }, async (row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header
+        
+        const idValue = row.getCell(idColumnIndex).value;
+        if (!idValue || idValue === 'Total') return; // Skip total rows
+
+        try {
+          // Convert _id to ObjectId
+          let objectId;
+          try {
+            objectId = ObjectId.createFromHexString(idValue);
+          } catch (e) {
+            console.log(`Invalid ObjectId in row ${rowNumber}: ${idValue}`);
+            errorCount++;
+            return;
+          }
+
+          // Build update document from row data
+          const updateDoc = {};
+          row.eachCell((cell, colNumber) => {
+            const fieldName = headers[colNumber];
+            if (!fieldName || fieldName === '_id' || fieldName === 'subtotal') {
+              return; // Skip _id and subtotal (calculated field)
+            }
+
+            let value = cell.value;
+            
+            // Handle formula cells - use the result
+            if (value && typeof value === 'object' && 'result' in value) {
+              value = value.result;
+            }
+
+            // Convert to appropriate type based on field name
+            if (fieldName.includes('price') || fieldName.includes('available') || 
+                fieldName.includes('width') || fieldName.includes('height') || 
+                fieldName.includes('depth') || fieldName.includes('thickness') ||
+                fieldName.includes('meter')) {
+              updateDoc[fieldName] = Number(value) || 0;
+            } else {
+              updateDoc[fieldName] = value;
+            }
+          });
+
+          // Calculate price based on the data
+          if (updateDoc.calculation_type && updateDoc.available) {
+            const price = calculatePrice(updateDoc);
+            updateDoc.price = price;
+          }
+
+          // Update the document
+          await collection.updateOne(
+            { _id: objectId },
+            { $set: updateDoc }
+          );
+
+          updatedCount++;
+        } catch (error) {
+          console.error(`Error updating row ${rowNumber}:`, error);
+          errorCount++;
+          errors.push({ row: rowNumber, error: error.message });
+        }
+      });
+    }
+
+    // Clean up uploaded file
+    await fs.unlink(uploadedFile.filepath);
+
+    res.status(200).json({
+      success: true,
+      message: `Import completed. Updated ${updatedCount} records.`,
+      updatedCount,
+      errorCount,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    console.error("Import error:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// Calculate price based on calculation_type (same logic as export)
+function calculatePrice(product) {
+  const {
+    calculation_type,
+    available,
+    width_cm,
+    height_cm,
+    price_per_square_meter,
+    price_per_piece,
+    price_per_meter,
+    price_per_rol,
+    total_meter_per_rol
+  } = product;
+
+  switch (calculation_type) {
+    case 'bord':
+      return available * (width_cm * height_cm / 10000) * (price_per_square_meter || 0);
+    case 'stuk':
+      return available * (price_per_piece || 0);
+    case 'rol_per_meter':
+      return available * (price_per_meter || 0);
+    case 'rol_per_square_meter':
+      return available * (width_cm / 100) * (price_per_square_meter || 0);
+    case 'total_rol_per_meter':
+      if (total_meter_per_rol && total_meter_per_rol > 0) {
+        return (price_per_rol / total_meter_per_rol) * available;
+      }
+      return 0;
+    default:
+      return 0;
+  }
+}

@@ -126,7 +126,11 @@ export default async (req, res) => {
       await fs.mkdir(resultFolder, { recursive: true });
     }
 
-    const exportedFiles = [];
+    // Create ONE workbook for all databases
+    const workbook = new ExcelJS.Workbook();
+    
+    // Array to store ALL subtotal references for the final 'Totals' sheet
+    const allSubtotalReferences = [];
 
     for (const dbName of databasesToExport) {
       console.log(`Processing database: ${dbName}`);
@@ -134,12 +138,6 @@ export default async (req, res) => {
 
       // List all collections in the current database
       const collections = await db.listCollections().toArray();
-
-      // Create a new workbook for the current database
-      const workbook = new ExcelJS.Workbook();
-
-      // Array to store subtotal references for the 'total' sheet
-      const subtotalReferences = [];
 
       for (const col of collections) {
         const collectionName = col.name;
@@ -149,8 +147,9 @@ export default async (req, res) => {
         // Fetch all documents in the collection
         const documents = await collection.find({}).toArray();
 
-        // Create a new worksheet for the collection
-        const worksheet = workbook.addWorksheet(collectionName);
+        // Create worksheet name with database prefix to avoid duplicates
+        const worksheetName = `${dbName}_${collectionName}`.substring(0, 31); // Excel limit
+        const worksheet = workbook.addWorksheet(worksheetName);
 
         if (documents.length > 0) {
           // Get all unique keys
@@ -307,75 +306,104 @@ export default async (req, res) => {
             selectUnlockedCells: true,
           });
 
-          console.log(`    Exported ${collectionName} to Excel.`);
+          console.log(`    Exported ${worksheetName} to Excel.`);
 
-          // Store subtotal reference
+          // Store subtotal reference for the final totals sheet
           const subtotalCellAddress = `${subtotalCol}${totalRowNumber}`;
-          subtotalReferences.push({
-            sheetName: collectionName,
-            subtotalCell: `${collectionName}!${subtotalCellAddress}`,
+          allSubtotalReferences.push({
+            database: dbName,
+            collection: collectionName,
+            sheetName: worksheetName,
+            subtotalCell: `'${worksheetName}'!${subtotalCellAddress}`,
           });
         } else {
-          console.log(`    Collection ${collectionName} is empty. Skipping Excel export.`);
+          console.log(`    Collection ${collectionName} is empty. Skipping.`);
         }
       }
-
-      // Add total sheet if we have subtotals
-      if (subtotalReferences.length > 0) {
-        const totalWorksheet = workbook.addWorksheet('total');
-        totalWorksheet.addRow(['Sheet Name', 'Subtotal']);
-
-        subtotalReferences.forEach((ref) => {
-          totalWorksheet.addRow([ref.sheetName, { formula: `=${ref.subtotalCell}`, result: null }]);
-        });
-
-        const grandTotalRowNumber = subtotalReferences.length + 2;
-        const grandTotalFormula = `=SUM(B2:B${grandTotalRowNumber - 1})`;
-        totalWorksheet.addRow(['Grand Total', { formula: grandTotalFormula, result: null }]);
-
-        const headerRow = totalWorksheet.getRow(1);
-        headerRow.font = { bold: true };
-        headerRow.alignment = { horizontal: 'center' };
-
-        totalWorksheet.getColumn(2).numFmt = '€#,##0.00';
-        const grandTotalRow = totalWorksheet.getRow(grandTotalRowNumber);
-        grandTotalRow.getCell(1).font = { bold: true };
-        grandTotalRow.getCell(2).font = { bold: true };
-
-        totalWorksheet.eachRow((row, rowNumber) => {
-          row.eachCell((cell, colNumber) => {
-            cell.border = {
-              top: { style: 'thin' },
-              bottom: { style: 'thin' },
-              left: { style: 'thin' },
-              right: { style: 'thin' },
-            };
-          });
-        });
-
-        autoSizeColumns(totalWorksheet);
-      }
-
-      const dateString = getCurrentDateString();
-      const version = await getNextVersionNumber(dateString, dbName, resultFolder);
-      const excelFileName = `${dateString}-export-${dbName}-${version}.xlsx`;
-      const excelFilePath = path.join(resultFolder, excelFileName);
-
-      console.log(`Writing data to ${excelFileName}...`);
-      await workbook.xlsx.writeFile(excelFilePath);
-      console.log(`Data successfully written to ${excelFileName}`);
-
-      // Add the exported file path to the array
-      exportedFiles.push({
-        filename: excelFileName,
-        url: `/output/${excelFileName}`
-      });
     }
 
-    // Return the array of files
-    res.status(200).json({ files: exportedFiles });
+    // Add FINAL TOTALS sheet with all categories
+    if (allSubtotalReferences.length > 0) {
+      const totalsWorksheet = workbook.addWorksheet('TOTALS');
+      
+      // Add header
+      totalsWorksheet.addRow(['Database', 'Category', 'Total']);
+      const headerRow = totalsWorksheet.getRow(1);
+      headerRow.font = { bold: true, size: 12 };
+      headerRow.alignment = { horizontal: 'center' };
+      headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFD3D3D3' }
+      };
+
+      // Add each category total
+      allSubtotalReferences.forEach((ref) => {
+        totalsWorksheet.addRow([
+          ref.database,
+          ref.collection,
+          { formula: `=${ref.subtotalCell}`, result: null }
+        ]);
+      });
+
+      // Add grand total
+      const grandTotalRowNumber = allSubtotalReferences.length + 2;
+      const grandTotalRow = totalsWorksheet.addRow([
+        'GRAND TOTAL',
+        '',
+        { formula: `=SUM(C2:C${grandTotalRowNumber - 1})`, result: null }
+      ]);
+      
+      grandTotalRow.font = { bold: true, size: 14 };
+      grandTotalRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFEB3B' }
+      };
+
+      // Format totals column as Euro
+      totalsWorksheet.getColumn(3).numFmt = '€#,##0.00';
+
+      // Add borders to all cells
+      totalsWorksheet.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: 'thin' },
+            bottom: { style: 'thin' },
+            left: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+        });
+      });
+
+      // Auto-size columns
+      autoSizeColumns(totalsWorksheet);
+      
+      // Freeze header row
+      totalsWorksheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+      console.log('Created TOTALS sheet');
+    }
+
+    // Generate filename
+    const dateString = getCurrentDateString();
+    const version = await getNextVersionNumber(dateString, 'complete', resultFolder);
+    const excelFileName = `${dateString}-export-complete-${version}.xlsx`;
+    const excelFilePath = path.join(resultFolder, excelFileName);
+
+    console.log(`Writing all data to ${excelFileName}...`);
+    await workbook.xlsx.writeFile(excelFilePath);
+    console.log(`Data successfully written to ${excelFileName}`);
+
+    // Return the single exported file
+    res.status(200).json({ 
+      files: [{
+        filename: excelFileName,
+        url: `/output/${excelFileName}`
+      }]
+    });
   } catch (e) {
-    console.error(e);
+    console.error('Export error:', e);
     res.status(500).json({ error: e.message });
   }
 };

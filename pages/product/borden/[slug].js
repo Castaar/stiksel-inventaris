@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 // DB connect
 import clientPromise from "../../../lib/mongodb";
+import { getCollectionDefaults } from "../../../lib/collection-defaults";
 
 import Title from "../../../components/base/title";
 import CategoryTitle from "../../../components/blocks/category-title";
@@ -17,19 +18,53 @@ import Link from "next/link";
 export default function category({ product }) {
 
   const router = useRouter();
+  
+  // Check if product has price, if not use default from collection
+  const getInitialPrice = () => {
+    if (product?.price_per_square_meter && product.price_per_square_meter !== 0) {
+      return product.price_per_square_meter;
+    }
+    // Try to get default price for this collection
+    const defaults = getCollectionDefaults(router.query?.cat);
+    return defaults.price_per_square_meter || 0;
+  };
+
   const [stockInput, setStockInput] = useState({
     Beschikbaar: product?.available,
     Naam: product?.name,
-    Thickness: product?.thickness
+    Thickness: product?.thickness,
+    PricePerSquareMeter: getInitialPrice(),
+    WidthCm: product?.width_cm,
+    HeightCm: product?.height_cm
   });
+
+  // Watch for name changes and auto-parse dimensions
+  useEffect(() => {
+    if (stockInput.Naam) {
+      // Match numbers with optional comma or dot as decimal separator
+      // Matches patterns like: "305,5 X 40,8" or "97 x 24" or "100.5x50.5"
+      const match = stockInput.Naam.match(/(\d+[,.]?\d*)\s*[xX×]\s*(\d+[,.]?\d*)/);
+      if (match) {
+        // Replace comma with dot for parseFloat
+        const width = parseFloat(match[1].replace(',', '.'));
+        const height = parseFloat(match[2].replace(',', '.'));
+        // Only update if dimensions actually changed
+        if (stockInput.WidthCm !== width || stockInput.HeightCm !== height) {
+          setStockInput(prev => ({
+            ...prev,
+            WidthCm: width,
+            HeightCm: height
+          }));
+        }
+      }
+    }
+  }, [stockInput.Naam]);
 
   // delete record
   const removeFromMongo = async () => {
     try {
       fetch(
-        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-          process.env.NEXT_PUBLIC_API
-        }/api/delete-borden?collection=${router.query?.cat}`,
+        `/api/delete-borden?collection=${router.query?.cat}`,
         {
           method: "POST",
           body: JSON.stringify(product._id),
@@ -61,14 +96,17 @@ export default function category({ product }) {
       name: stockInput.Naam,
       available: Number(stockInput.Beschikbaar),
       thickness: Number(stockInput.Thickness),
+      price_per_square_meter: Number(stockInput.PricePerSquareMeter),
+      width_cm: Number(stockInput.WidthCm) || 0,
+      height_cm: Number(stockInput.HeightCm) || 0,
       _id: product._id,
     };
 
+    console.log('Saving data:', data); // Debug log
+
     try {
       fetch(
-        `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-          process.env.NEXT_PUBLIC_API
-        }/api/update-borden?collection=${router.query?.cat}`,
+        `/api/update-borden?collection=${router.query?.cat}`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -105,17 +143,47 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
-          placeholder="Vul een naam in"
+          placeholder="Vul een naam in (bijv. 97 X 24)"
+        />
+        <ProductItem
+          input="number"
+          value={product?.width_cm} 
+          label={"Breedte (cm)"}
+          db_key={"WidthCm"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
+          disabled={false}
+          placeholder="Breedte in cm"
+        />
+        <ProductItem
+          input="number"
+          value={product?.height_cm} 
+          label={"Hoogte (cm)"}
+          db_key={"HeightCm"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
+          disabled={false}
+          placeholder="Hoogte in cm"
         />
         <ProductItem
           input="number"
           value={product?.thickness} 
-          label={"Dikte"}
+          label={"Dikte (mm)"}
           db_key={"Thickness"}
           stockInput={stockInput}
           setStockInput={setStockInput} 
           disabled={false}
           placeholder="Vul een dikte in"
+        />
+        <ProductItem
+          input="number"
+          value={product?.price_per_square_meter} 
+          label={"Prijs per m²"}
+          db_key={"PricePerSquareMeter"}
+          stockInput={stockInput}
+          setStockInput={setStockInput} 
+          disabled={false}
+          placeholder="Vul prijs per m² in"
         />
         <ProductItem
           input="text"

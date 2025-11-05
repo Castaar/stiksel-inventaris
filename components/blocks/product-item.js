@@ -4,8 +4,12 @@ import styles from "../../styles/blocks/_product-item.module.scss";
 
 const productItem = (props) => {
   const router = useRouter();
-  // let stock = props.stockInput
   let label = props.label
+
+  // Use controlled input with value from stockInput state
+  const inputValue = props.stockInput?.[props.db_key] !== undefined 
+    ? props.stockInput[props.db_key] 
+    : props.value || '';
 
   return (
     <div className={styles["product"]}>
@@ -14,7 +18,7 @@ const productItem = (props) => {
         type={props.input}
         className={styles["product-item"]}
         placeholder={props.placeholder}
-        defaultValue={props.value}
+        value={inputValue}
         onChange={(e) =>
           props.setStockInput((stock) => ({
             ...stock,
