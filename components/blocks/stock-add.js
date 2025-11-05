@@ -44,7 +44,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         state: true,
         name: stockInput.name,
         format: stockInput.format ? stockInput.format : '',
-        price: stockInput.price || 0,
+        price: Number(stockInput.price) || 0,
         unit: stockInput.unit || '',
         available: Number(stockInput.available) || 0,
       };

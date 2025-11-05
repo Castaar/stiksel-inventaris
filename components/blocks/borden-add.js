@@ -62,14 +62,10 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         toast.error('Aantal stuks is verplicht');
         return;
       }
-      if (!stockInput.price_per_square_meter || Number(stockInput.price_per_square_meter) <= 0) {
-        toast.error('Prijs per m² is verplicht');
-        return;
-      }
 
       data = {
         name: stockInput.name,
-        thickness: stockInput.thickness || 0,
+        thickness: Number(stockInput.thickness) || 0,
         unit: stockInput.unit || 'stuks',
         available: Number(stockInput.available) || 0,
         calculation_type: stockInput.calculation_type || 'bord',
@@ -269,10 +265,9 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                 <div className={styles["category"]}>
                   <input
                     className={styles["category-search"]}
-                    placeholder="Prijs per m² *"
+                    placeholder="Prijs per m²"
                     type="number"
                     step="0.01"
-                    required
                     value={stockInput.price_per_square_meter || ''}
                     onChange={(e) =>
                       setStockInput((prev) => ({
