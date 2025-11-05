@@ -13,6 +13,17 @@ export default function Categories(props) {
 
   const router = useRouter();
   const { product } = router.query;
+  const [isReloading, setIsReloading] = React.useState(false);
+
+  const handleReload = () => {
+    setIsReloading(true);
+    router.replace(router.asPath);
+  };
+
+  // Check if we have data
+  const hasCollections = Array.isArray(props?.collections) && props.collections.length > 0;
+  const hasProducts = Array.isArray(props?.products) && props.products.length > 0;
+  const showReloadButton = !hasCollections;
 
   return (
     <main className="main">
@@ -22,12 +33,28 @@ export default function Categories(props) {
         </Link>
         <Title value="Borden aanvullen." url={"/borden"} />
       </div>
-      <ProductAdd
-        selectedOption={product ? product : "Selecteer"}
-        collections={props.collections}
-        products={props.products}
-        toast={toast}
-      />
+      {showReloadButton ? (
+        <div className="no-products-found">
+          <h2>Geen gegevens geladen</h2>
+          <p>De collecties konden niet worden geladen.</p>
+          <div style={{ marginTop: '20px' }}>
+            <button 
+              className="btn-secondary download" 
+              onClick={handleReload}
+              disabled={isReloading}
+            >
+              {isReloading ? 'Laden...' : 'Opnieuw laden'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <ProductAdd
+          selectedOption={product ? product : "Selecteer"}
+          collections={props.collections}
+          products={props.products}
+          toast={toast}
+        />
+      )}
     </main>
   );
 }
