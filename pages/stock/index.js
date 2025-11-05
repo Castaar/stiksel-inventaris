@@ -73,61 +73,75 @@ export default function categories(props) {
   );
 }
 
-export async function getServerSideProps() {
-  try {
-    console.log('[Stock] Starting getServerSideProps...');
-    
-    // Ensure MongoDB connection is established
-    const client = await clientPromise;
-    console.log('[Stock] MongoDB client connected');
-    
-    // Wait for connection to be ready
-    await client.connect();
-    console.log('[Stock] MongoDB connection established');
-    
-    const db = client.db("stock");
-    console.log('[Stock] Database selected');
+export async function getServerSideProps(context) {
+  // Helper function to fetch collections with retry
+  const fetchCollections = async (retryCount = 0) => {
+    try {
+      console.log(`[Stock] Attempt ${retryCount + 1}: Starting getServerSideProps...`);
+      
+      // Ensure MongoDB connection is established
+      const client = await clientPromise;
+      console.log('[Stock] MongoDB client connected');
+      
+      // Wait for connection to be ready
+      await client.connect();
+      console.log('[Stock] MongoDB connection established');
+      
+      const db = client.db("stock");
+      console.log('[Stock] Database selected');
 
-    const collections = await db.listCollections().toArray();
-    console.log('[Stock] Collections fetched:', collections.length);
-    console.log('[Stock] Collection structure:', JSON.stringify(collections[0])); // Log first collection
-    
-    if (collections.length === 0) {
-      console.warn('[Stock] WARNING: No collections found in database!');
-    }
-    
-    collections.sort((a, b) => a.name.localeCompare(b.name));
+      const collections = await db.listCollections().toArray();
+      console.log('[Stock] Collections fetched:', collections.length);
+      
+      // If no collections found and we haven't retried yet, retry once
+      if (collections.length === 0 && retryCount === 0) {
+        console.warn('[Stock] WARNING: No collections found, retrying once...');
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms before retry
+        return fetchCollections(1); // Retry
+      }
+      
+      if (collections.length === 0) {
+        console.warn('[Stock] WARNING: No collections found after retry!');
+      }
+      
+      collections.sort((a, b) => a.name.localeCompare(b.name));
 
-    // Serialize collections properly - ensure plain objects
-    const serializedCollections = collections.map(col => {
+      // Serialize collections properly - ensure plain objects
+      const serializedCollections = collections.map(col => {
+        return {
+          name: String(col.name || ''),
+          type: String(col.type || 'collection')
+        };
+      });
+      
+      console.log('[Stock] Serialized collections:', serializedCollections.length);
+
       return {
-        name: String(col.name || ''),
-        type: String(col.type || 'collection')
+        props: { 
+          collections: serializedCollections
+        },
       };
-    });
-    
-    console.log('[Stock] Serialized collections:', serializedCollections.length);
-    console.log('[Stock] First serialized:', JSON.stringify(serializedCollections[0]));
+    } catch (e) {
+      console.error(`[Stock] Error in getServerSideProps (attempt ${retryCount + 1}):`, e.message);
+      
+      // If error on first attempt, retry once
+      if (retryCount === 0) {
+        console.log('[Stock] Retrying after error...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return fetchCollections(1);
+      }
+      
+      console.error('[Stock] Full error after retry:', e);
+      
+      // Return empty array with error flag
+      return {
+        props: { 
+          collections: [],
+          error: e.message 
+        },
+      };
+    }
+  };
 
-    const result = {
-      props: { 
-        collections: serializedCollections
-      },
-    };
-    
-    console.log('[Stock] Returning props with', result.props.collections.length, 'collections');
-    
-    return result;
-  } catch (e) {
-    console.error('[Stock] Error in getServerSideProps:', e.message);
-    console.error('[Stock] Full error:', e);
-    
-    // Return empty array with error flag
-    return {
-      props: { 
-        collections: [],
-        error: e.message 
-      },
-    };
-  }
+  return fetchCollections();
 }
