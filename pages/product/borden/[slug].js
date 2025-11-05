@@ -9,6 +9,8 @@ import Title from "../../../components/base/title";
 import CategoryTitle from "../../../components/blocks/category-title";
 import ProductItem from "../../../components/blocks/product-item";
 
+import styles from "../../../styles/blocks/_product-item.module.scss";
+
 import { ObjectId } from "mongodb";
 
 import { toast } from 'react-hot-toast';
@@ -208,10 +210,10 @@ export default function category({ product }) {
           disabled={false}
           placeholder="Vul aantal beschikbare meters in"
         />
-        <div className="form-row">
-          <label htmlFor="afgewerkt_formaat">Afgewerkt formaat</label>
+        <div className={styles["product"]}>
+          <label>Afgewerkt formaat:</label>
           <select
-            id="afgewerkt_formaat"
+            className={styles["product-item"]}
             value={stockInput.AfgewerktFormaat}
             onChange={(e) => setStockInput({ ...stockInput, AfgewerktFormaat: e.target.value })}
           >
