@@ -236,11 +236,14 @@ async function calculateTotalPriceForDB(dbName) {
       const documents = await coll.find({}).toArray();
 
       const collectionPrice = documents.reduce((sum, doc) => {
-        // Calculate price based on calculation_type for accurate totals
         let itemPrice = 0;
 
-        if (doc.calculation_type) {
-          // Calculate price dynamically based on type
+        // First try to use the stored price field
+        if (doc.price && !isNaN(doc.price) && doc.price > 0) {
+          itemPrice = doc.price;
+        } 
+        // If no price or price is 0, try to calculate based on calculation_type
+        else if (doc.calculation_type) {
           switch (doc.calculation_type) {
             case 'bord':
               itemPrice = (doc.available || 0) * 
@@ -265,11 +268,8 @@ async function calculateTotalPriceForDB(dbName) {
               }
               break;
             default:
-              itemPrice = doc.price || 0;
+              itemPrice = 0;
           }
-        } else {
-          // Fallback to stored price field if no calculation_type
-          itemPrice = doc.price || 0;
         }
 
         return sum + (isNaN(itemPrice) ? 0 : itemPrice);
@@ -278,6 +278,7 @@ async function calculateTotalPriceForDB(dbName) {
       totalPrice += collectionPrice;
     }
 
+    console.log(`[calculateTotalPriceForDB] ${dbName} total:`, totalPrice);
     return totalPrice;
   } catch (error) {
     console.error(`Error calculating total price for database ${dbName}:`, error);
