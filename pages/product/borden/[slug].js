@@ -35,7 +35,8 @@ export default function category({ product }) {
     Thickness: product?.thickness,
     PricePerSquareMeter: getInitialPrice(),
     WidthCm: product?.width_cm,
-    HeightCm: product?.height_cm
+    HeightCm: product?.height_cm,
+    AfgewerktFormaat: product?.afgewerkt_formaat || ''
   });
 
   // Watch for name changes and auto-parse dimensions
@@ -99,6 +100,7 @@ export default function category({ product }) {
       price_per_square_meter: Number(stockInput.PricePerSquareMeter),
       width_cm: Number(stockInput.WidthCm) || 0,
       height_cm: Number(stockInput.HeightCm) || 0,
+      afgewerkt_formaat: stockInput.AfgewerktFormaat,
       _id: product._id,
     };
 
@@ -206,6 +208,18 @@ export default function category({ product }) {
           disabled={false}
           placeholder="Vul aantal beschikbare meters in"
         />
+        <div className="form-row">
+          <label htmlFor="afgewerkt_formaat">Afgewerkt formaat</label>
+          <select
+            id="afgewerkt_formaat"
+            value={stockInput.AfgewerktFormaat}
+            onChange={(e) => setStockInput({ ...stockInput, AfgewerktFormaat: e.target.value })}
+          >
+            <option value="">-</option>
+            <option value="Ja">Ja</option>
+            <option value="Nee">Nee</option>
+          </select>
+        </div>
       </div>
       <div className="btn-wrapper">
         <button className="btn" onClick={updateToMongo}>

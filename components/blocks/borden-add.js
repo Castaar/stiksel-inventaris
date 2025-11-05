@@ -73,6 +73,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         height_cm: Number(stockInput.height_cm) || 0,
         price_per_square_meter: Number(stockInput.price_per_square_meter) || 0,
         price_per_piece: Number(stockInput.price_per_piece) || 0,
+        afgewerkt_formaat: stockInput.afgewerkt_formaat || '',
       };
     } else {
       const productOld = safeProducts.find(product => product._id === selectedProduct);
@@ -97,6 +98,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         height_cm: productOld.height_cm,
         price_per_square_meter: productOld.price_per_square_meter,
         price_per_piece: productOld.price_per_piece,
+        afgewerkt_formaat: productOld.afgewerkt_formaat,
       };
     }
 
@@ -290,6 +292,22 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                       }))
                     }
                   />
+                </div>
+                <div className={styles["category"]}>
+                  <select
+                    className={styles["category-search"]}
+                    onChange={(e) => {
+                      setStockInput((prev) => ({
+                        ...prev,
+                        afgewerkt_formaat: e.target.value,
+                      }));
+                    }}
+                    defaultValue=""
+                  >
+                    <option value="">Afgewerkt formaat</option>
+                    <option value="Ja">Ja</option>
+                    <option value="Nee">Nee</option>
+                  </select>
                 </div>
                 <div className={styles["category"]}>
                   <input

@@ -90,7 +90,8 @@ export default async function handler(req, res) {
       price_per_piece,
       price_per_meter,
       price_per_rol,
-      total_meter_per_rol
+      total_meter_per_rol,
+      afgewerkt_formaat
     } = req.body;
 
     if (_id) {
@@ -160,6 +161,7 @@ export default async function handler(req, res) {
       price_per_meter: Number(price_per_meter) || 0,
       price_per_rol: Number(price_per_rol) || 0,
       total_meter_per_rol: Number(total_meter_per_rol) || 0,
+      afgewerkt_formaat: afgewerkt_formaat || '',
       price: 0 // Will be calculated below
     };
 

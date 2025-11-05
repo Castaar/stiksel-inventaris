@@ -59,7 +59,7 @@ export default async (req, res) => {
     const docId = { _id: objectId };
 
     // Validate request body
-    const { name, available, thickness, price_per_square_meter, width_cm, height_cm } = req.body;
+    const { name, available, thickness, price_per_square_meter, width_cm, height_cm, afgewerkt_formaat } = req.body;
 
     // Get existing product to merge with updates
     const existingProduct = await collection.findOne(docId);
@@ -98,6 +98,7 @@ export default async (req, res) => {
       price_per_square_meter: finalPricePerSquareMeter,
       width_cm: parsedWidth || 0,
       height_cm: parsedHeight || 0,
+      afgewerkt_formaat: afgewerkt_formaat !== undefined ? afgewerkt_formaat : existingProduct.afgewerkt_formaat,
     };
 
     // Recalculate price
@@ -111,6 +112,7 @@ export default async (req, res) => {
         price_per_square_meter: updatedProduct.price_per_square_meter,
         width_cm: updatedProduct.width_cm,
         height_cm: updatedProduct.height_cm,
+        afgewerkt_formaat: updatedProduct.afgewerkt_formaat,
         price: newPrice,
       },
     };
