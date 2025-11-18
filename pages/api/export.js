@@ -117,15 +117,6 @@ export default async (req, res) => {
   try {
     const client = await clientPromise;
 
-    // Create the 'public/output' folder if it doesn't exist
-    const resultFolder = path.join(process.cwd(), 'public', 'output');
-    try {
-      await fs.access(resultFolder);
-    } catch {
-      console.log('Creating output folder...');
-      await fs.mkdir(resultFolder, { recursive: true });
-    }
-
     // Create ONE workbook for all databases
     const workbook = new ExcelJS.Workbook();
     
@@ -387,23 +378,22 @@ export default async (req, res) => {
 
     // Generate filename
     const dateString = getCurrentDateString();
-    const version = await getNextVersionNumber(dateString, 'complete', resultFolder);
-    const excelFileName = `${dateString}-export-complete-${version}.xlsx`;
-    const excelFilePath = path.join(resultFolder, excelFileName);
+    const excelFileName = `${dateString}-export-complete.xlsx`;
 
-    console.log(`Writing all data to ${excelFileName}...`);
-    await workbook.xlsx.writeFile(excelFilePath);
-    console.log(`Data successfully written to ${excelFileName}`);
-
-    // Return the single exported file
-    res.status(200).json({ 
-      files: [{
-        filename: excelFileName,
-        url: `/output/${excelFileName}`
-      }]
-    });
+    console.log(`Generating Excel file: ${excelFileName}...`);
+    
+    // Write to buffer instead of file (for serverless/production)
+    const buffer = await workbook.xlsx.writeBuffer();
+    
+    // Set headers to trigger download
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${excelFileName}"`);
+    res.setHeader('Content-Length', buffer.length);
+    
+    res.status(200).send(buffer);
+    console.log(`Excel file generated successfully`);
   } catch (e) {
     console.error('Export error:', e);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e.message, stack: e.stack });
   }
 };

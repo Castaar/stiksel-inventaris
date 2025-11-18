@@ -8,7 +8,7 @@ import InfoBlock from "../components/blocks/info-block";
 export default function Home(props) {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [isClearing, setIsClearing] = useState(false);
   
   // Defensive checks for props
   const stockTotal = props?.stock?.price?.total ?? 0;
@@ -21,34 +21,45 @@ export default function Home(props) {
 
   const exportDatabase = async () => {
     setIsExporting(true);
-    setFiles([]); // reset files array on each export attempt
 
     try {
       // Use relative URL for API calls - Next.js handles this correctly
       const response = await fetch('/api/export', {
         method: "GET",
-        headers: {
-          Accept: "application/json, text/plain, */*",
-        },
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      const returnedFiles = data.files;
-
-      if (!returnedFiles) {
-        throw new Error("Files not found in the response.");
+      // Get the blob from the response
+      const blob = await response.blob();
+      
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'export-complete.xlsx';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
       }
 
-      setFiles(returnedFiles);
+      // Create a download link and trigger it
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
       toast.success("Export successful!");
     } catch (error) {
-      console.log(error);
-      toast.error("'t Spel es kapot");
+      console.error('Export error:', error);
+      toast.error(`Export failed: ${error.message}`);
     } finally {
       setIsExporting(false);
     }
@@ -105,6 +116,54 @@ export default function Home(props) {
     }
   };
 
+  const clearDatabase = async () => {
+    // Double confirmation
+    const confirmFirst = confirm('⚠️ WAARSCHUWING: Dit zal ALLE data uit de database verwijderen maar de collecties behouden. Weet je het zeker?');
+    if (!confirmFirst) return;
+
+    const confirmSecond = confirm('Ben je echt 100% zeker? Deze actie kan NIET ongedaan gemaakt worden!');
+    if (!confirmSecond) return;
+
+    // Prompt for password
+    const password = prompt('Voer het wachtwoord in om de database te legen:');
+    if (!password) return;
+
+    setIsClearing(true);
+
+    try {
+      const response = await fetch('/api/clear-database', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          throw new Error('Incorrect password');
+        }
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      toast.success(`Database cleared! Deleted ${data.totalDeleted} documents.`);
+      
+      // Reload page to show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Clear database error:', error);
+      toast.error(error.message || "Clear failed");
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -153,21 +212,16 @@ export default function Home(props) {
           )}
         </div>
 
-        {/* If there are files after a successful export, show download buttons */}
-        {files && files.length > 0 && (
-          <div className="mt-20">
-            {files.map((file, index) => (
-              <a
-                key={index}
-                href={file.url}
-                download
-                className="btn-secondary download mr-10"
-              >
-                {file.filename}
-              </a>
-            ))}
-          </div>
-        )}
+        <div className="mt-20">
+          {isClearing ? (
+            <span>clearing database...</span>
+          ) : (
+            <button className="btn-secondary download" onClick={clearDatabase} style={{ backgroundColor: '#d32f2f' }}>
+              Clear Database
+            </button>
+          )}
+        </div>
+
       </main>
     </>
   );
