@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { getCollectionDefaults } from '../../lib/collection-defaults';
 
 import styles from "../../styles/blocks/_product-add.module.scss";
 
@@ -15,6 +16,17 @@ export default function Dropdowns({ collections, products, toast, selectedOption
   // Defensive checks for props
   const safeCollections = Array.isArray(collections) ? collections : [];
   const safeProducts = Array.isArray(products) ? products : [];
+
+  // Set default price when collection changes and user selects "new product"
+  useEffect(() => {
+    if (selectedCollection !== 'Selecteer' && selectedProduct === 'new') {
+      const defaults = getCollectionDefaults(`stock_${selectedCollection}`);
+      setStockInput(prev => ({
+        ...prev,
+        price: defaults.price_per_piece || defaults.price_per_meter || 0,
+      }));
+    }
+  }, [selectedCollection, selectedProduct]);
 
   const handleCollectionChange = (newCollection) => {
     setSelectedCollection(newCollection);
@@ -184,6 +196,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                     className={styles["category-search"]}
                     placeholder="Prijs"
                     type="number"
+                    value={stockInput.price || ''}
                     onChange={(e) =>
                       setStockInput((prev) => ({
                         ...prev,
