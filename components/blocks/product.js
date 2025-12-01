@@ -19,6 +19,9 @@ const product = (props) => {
           </>
         }
       </p>
+      <p className={styles["product-title"]}>
+        {props.afgewerkt_formaat_header || props.afgewerkt_formaat || '-'}
+      </p>
       {props.edit && (
         <a
           className={styles["product-link"]}

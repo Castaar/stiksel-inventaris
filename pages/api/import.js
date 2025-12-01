@@ -78,13 +78,29 @@ export default async function handler(req, res) {
         continue;
       }
 
-      // Process each data row (skip header and total rows)
-      worksheet.eachRow({ includeEmpty: false }, async (row, rowNumber) => {
+      // Collect all rows to process
+      const rowsToProcess = [];
+      worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
         if (rowNumber === 1) return; // Skip header
         
         const idValue = row.getCell(idColumnIndex).value;
         if (!idValue || idValue === 'Total') return; // Skip total rows
+        
+        rowsToProcess.push({ row, rowNumber });
+      });
 
+      // Skip empty worksheets (no data rows)
+      if (rowsToProcess.length === 0) {
+        console.log(`Skipping empty worksheet: ${worksheet.name}`);
+        continue;
+      }
+
+      console.log(`Processing ${worksheet.name} with ${rowsToProcess.length} rows...`);
+
+      // Process each row sequentially
+      for (const { row, rowNumber } of rowsToProcess) {
+        const idValue = row.getCell(idColumnIndex).value;
+        
         try {
           // Convert _id to ObjectId
           let objectId;
@@ -93,15 +109,18 @@ export default async function handler(req, res) {
           } catch (e) {
             console.log(`Invalid ObjectId in row ${rowNumber}: ${idValue}`);
             errorCount++;
-            return;
+            errors.push({ row: rowNumber, error: `Invalid ObjectId: ${idValue}` });
+            continue;
           }
 
           // Build update document from row data
-          const updateDoc = {};
+          const updateDoc = {
+            _id: objectId // Ensure _id is set for upsert
+          };
           row.eachCell((cell, colNumber) => {
             const fieldName = headers[colNumber];
             if (!fieldName || fieldName === '_id' || fieldName === 'subtotal') {
-              return; // Skip _id and subtotal (calculated field)
+              return; // Skip _id (already set) and subtotal (calculated field)
             }
 
             let value = cell.value;
@@ -128,23 +147,33 @@ export default async function handler(req, res) {
             updateDoc.price = price;
           }
 
-          // Update the document
-          await collection.updateOne(
+          // Update the document (or insert if it doesn't exist - upsert)
+          const result = await collection.updateOne(
             { _id: objectId },
-            { $set: updateDoc }
+            { $set: updateDoc },
+            { upsert: true }
           );
 
-          updatedCount++;
+          if (result.modifiedCount > 0 || result.upsertedCount > 0 || result.matchedCount > 0) {
+            updatedCount++;
+            console.log(`Updated/Inserted row ${rowNumber} in ${worksheet.name} (matched: ${result.matchedCount}, modified: ${result.modifiedCount}, upserted: ${result.upsertedCount})`);
+          } else {
+            console.log(`No changes for row ${rowNumber} in ${worksheet.name}`);
+          }
         } catch (error) {
           console.error(`Error updating row ${rowNumber}:`, error);
           errorCount++;
           errors.push({ row: rowNumber, error: error.message });
         }
-      });
+      }
+      
+      console.log(`Processed ${worksheet.name}: ${rowsToProcess.length} rows`);
     }
 
     // Clean up uploaded file
     await fs.unlink(uploadedFile.filepath);
+
+    console.log(`Import completed: ${updatedCount} updated, ${errorCount} errors`);
 
     res.status(200).json({
       success: true,

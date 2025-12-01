@@ -56,6 +56,7 @@ export default function category(props) {
               format={"Dikte (mm):"}
               number={"Productnummer:"}
               available={"Beschikbaar (m):"}
+              afgewerkt_formaat_header={"Afgewerkt:"}
               edit={false}
             />
         }
