@@ -151,6 +151,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
             <>
               <div className="main-list-stock">
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Omschrijving</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Omschrijving"
@@ -164,6 +165,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Formaat cm</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Formaat cm"
@@ -177,6 +179,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Eenheid</label>
                   <select
                     className={styles["category-search"]}
                     onChange={(e) => {
@@ -192,6 +195,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   </select>
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Prijs</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Prijs"
@@ -206,6 +210,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Aantal m / stuks</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Aantal m / stuks"
@@ -230,6 +235,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
             <>
               <div className="main-list-stock">
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Aantal m / stuks</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Aantal m / stuks"

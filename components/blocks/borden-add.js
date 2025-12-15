@@ -20,7 +20,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
   // Set default price when collection changes and user selects "new product"
   useEffect(() => {
     if (selectedCollection !== 'Selecteer' && selectedProduct === 'new') {
-      const defaults = getCollectionDefaults(selectedCollection);
+      const defaults = getCollectionDefaults(selectedCollection, stockInput.thickness);
       setStockInput(prev => ({
         ...prev,
         price_per_square_meter: defaults.price_per_square_meter,
@@ -28,6 +28,19 @@ export default function Dropdowns({ collections, products, toast, selectedOption
       }));
     }
   }, [selectedCollection, selectedProduct]);
+
+  // Update price when thickness changes for new product
+  useEffect(() => {
+    if (selectedCollection !== 'Selecteer' && selectedProduct === 'new' && stockInput.thickness) {
+      const defaults = getCollectionDefaults(selectedCollection, stockInput.thickness);
+      if (defaults.price_per_square_meter) {
+        setStockInput(prev => ({
+          ...prev,
+          price_per_square_meter: defaults.price_per_square_meter
+        }));
+      }
+    }
+  }, [stockInput.thickness, selectedCollection, selectedProduct]);
 
   const handleCollectionChange = (newCollection) => {
     setSelectedCollection(newCollection);
@@ -175,6 +188,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
             <>
               <div className="main-list-stock">
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Naam (bijv. 38 x 35)</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Naam (bijv. 38 x 35)"
@@ -194,6 +208,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Dikte (mm)</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Dikte (mm)"
@@ -207,6 +222,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Breedte (cm)</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Breedte (cm)"
@@ -221,6 +237,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Hoogte (cm)</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Hoogte (cm)"
@@ -235,6 +252,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Eenheid</label>
                   <select
                     className={styles["category-search"]}
                     onChange={(e) => {
@@ -250,6 +268,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   </select>
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Berekeningstype</label>
                   <select
                     className={styles["category-search"]}
                     onChange={(e) => {
@@ -265,6 +284,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   </select>
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Prijs per m²</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Prijs per m²"
@@ -280,6 +300,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Prijs per stuk</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Prijs per stuk"
@@ -294,6 +315,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Afgewerkt formaat</label>
                   <select
                     className={styles["category-search"]}
                     onChange={(e) => {
@@ -310,6 +332,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   </select>
                 </div>
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Aantal stuks</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Aantal stuks"
@@ -334,6 +357,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
             <>
               <div className="main-list-stock">
                 <div className={styles["category"]}>
+                  <label className={styles["label"]}>Aantal m / stuks</label>
                   <input
                     className={styles["category-search"]}
                     placeholder="Aantal m / stuks"

@@ -26,3 +26,12 @@
         }
     }
 }
+
+.label {
+    color: $gold;
+    font-size: clamp(0.875rem, 0.5rem + 0.7813vw, 1.375rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+}
