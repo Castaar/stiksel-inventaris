@@ -212,7 +212,7 @@ export default function Home(props) {
           )}
         </div>
 
-        <div className="mt-20">
+        {/* <div className="mt-20">
           {isClearing ? (
             <span>clearing database...</span>
           ) : (
@@ -220,7 +220,7 @@ export default function Home(props) {
               Clear Database
             </button>
           )}
-        </div>
+        </div> */}
 
       </main>
     </>
