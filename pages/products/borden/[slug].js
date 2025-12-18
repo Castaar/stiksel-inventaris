@@ -55,7 +55,7 @@ export default function category(props) {
               name={"Naam:"}
               format={"Dikte (mm):"}
               number={"Productnummer:"}
-              available={"Beschikbaar (m):"}
+              available={"Beschikbaar:"}
               afgewerkt_formaat_header={"Afgewerkt:"}
               edit={false}
             />
