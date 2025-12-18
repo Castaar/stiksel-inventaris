@@ -59,6 +59,8 @@ export default function Dropdowns({ collections, products, toast, selectedOption
         price: Number(stockInput.price) || 0,
         unit: stockInput.unit || '',
         available: Number(stockInput.available) || 0,
+        width_cm: Number(stockInput.width_cm) || 0,
+        height_cm: Number(stockInput.height_cm) || 0,
       };
     } else {
       const productOld = safeProducts.find(product => product._id === selectedProduct);
@@ -182,6 +184,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   <label className={styles["label"]}>Eenheid</label>
                   <select
                     className={styles["category-search"]}
+                    value={stockInput.unit || ''}
                     onChange={(e) => {
                       setStockInput((prev) => ({
                         ...prev,
@@ -194,6 +197,40 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                     <option value="m">m</option>
                   </select>
                 </div>
+                {stockInput.unit === 'stuks' && (
+                  <>
+                    <div className={styles["category"]}>
+                      <label className={styles["label"]}>Breedte (cm)</label>
+                      <input
+                        className={styles["category-search"]}
+                        placeholder="Breedte (cm)"
+                        type="number"
+                        value={stockInput.width_cm || ''}
+                        onChange={(e) =>
+                          setStockInput((prev) => ({
+                            ...prev,
+                            width_cm: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className={styles["category"]}>
+                      <label className={styles["label"]}>Hoogte (cm)</label>
+                      <input
+                        className={styles["category-search"]}
+                        placeholder="Hoogte (cm)"
+                        type="number"
+                        value={stockInput.height_cm || ''}
+                        onChange={(e) =>
+                          setStockInput((prev) => ({
+                            ...prev,
+                            height_cm: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </>
+                )}
                 <div className={styles["category"]}>
                   <label className={styles["label"]}>Prijs</label>
                   <input
