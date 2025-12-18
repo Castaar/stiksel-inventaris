@@ -167,10 +167,10 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                   />
                 </div>
                 <div className={styles["category"]}>
-                  <label className={styles["label"]}>Formaat cm</label>
+                  <label className={styles["label"]}>Formaat m</label>
                   <input
                     className={styles["category-search"]}
-                    placeholder="Formaat cm"
+                    placeholder="Formaat m"
                     required
                     onChange={(e) =>
                       setStockInput((prev) => ({
@@ -197,7 +197,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                     <option value="m">m</option>
                   </select>
                 </div>
-                {stockInput.unit === 'stuks' && (
+                {/* {stockInput.unit === 'stuks' && (
                   <>
                     <div className={styles["category"]}>
                       <label className={styles["label"]}>Breedte (cm)</label>
@@ -230,7 +230,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                       />
                     </div>
                   </>
-                )}
+                )} */}
                 <div className={styles["category"]}>
                   <label className={styles["label"]}>Prijs</label>
                   <input

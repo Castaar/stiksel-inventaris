@@ -7,11 +7,23 @@ const product = (props) => {
 
   const unitCheck = props.unit === "stuks";
 
+  // Format number to 2 decimals if it's a number
+  const formatValue = (value) => {
+    if (!value) return value;
+    const num = parseFloat(value.toString().replace(',', '.'));
+    if (!isNaN(num)) {
+      // Format to 2 decimals and remove trailing zeros
+      const formatted = num.toFixed(2).replace(/\.?0+$/, '');
+      return formatted.replace('.', ',');
+    }
+    return value;
+  };
+
   return (
     <div className={styles["product"]}>
       <p className={styles["product-title"]}>{ props?.name }</p>
       <p className={styles["product-title"]}>{ props.available }</p>
-      <p className={styles["product-title"]}>{ props?.format }
+      <p className={styles["product-title"]}>{ formatValue(props?.format) }
         {
           props.thickness && 
           <>

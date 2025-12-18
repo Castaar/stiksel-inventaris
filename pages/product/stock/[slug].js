@@ -115,7 +115,7 @@ export default function category({ product }) {
         <ProductItem
           input="text"
           value={product?.format} 
-          label={"Formaat"}
+          label={"Formaat cm"}
           db_key={"Formaat"}
           stockInput={stockInput}
           setStockInput={setStockInput} 
@@ -141,7 +141,7 @@ export default function category({ product }) {
           stockInput={stockInput}
           setStockInput={setStockInput}
           disabled={false}
-          placeholder="Vul aantal beschikbare meters in"
+          placeholder="Vul aantal beschikbare cm in"
         />
       </div>
       <div className="btn-wrapper">
