@@ -92,7 +92,7 @@ export default async (req, res) => {
     // Merge updates with existing product
     const updatedProduct = {
       ...existingProduct,
-      name: name !== undefined ? name : existingProduct.name,
+      name: name !== undefined ? (name ? name.toUpperCase() : name) : existingProduct.name,
       available: available !== undefined ? Number(available) : existingProduct.available,
       thickness: thickness !== undefined ? Number(thickness) : existingProduct.thickness,
       price_per_square_meter: finalPricePerSquareMeter,

@@ -41,6 +41,7 @@ export default async function handler(req, res) {
     await workbook.xlsx.readFile(uploadedFile.filepath);
 
     let updatedCount = 0;
+    let deletedCount = 0;
     let errorCount = 0;
     const errors = [];
 
@@ -78,15 +79,24 @@ export default async function handler(req, res) {
         continue;
       }
 
-      // Collect all rows to process
+      // Collect all rows to process and their IDs
       const rowsToProcess = [];
+      const excelIds = [];
       worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
         if (rowNumber === 1) return; // Skip header
         
         const idValue = row.getCell(idColumnIndex).value;
         if (!idValue || idValue === 'Total') return; // Skip total rows
         
-        rowsToProcess.push({ row, rowNumber });
+        try {
+          const objectId = ObjectId.createFromHexString(idValue);
+          excelIds.push(objectId);
+          rowsToProcess.push({ row, rowNumber, objectId });
+        } catch (e) {
+          console.log(`Invalid ObjectId in row ${rowNumber}: ${idValue}`);
+          errorCount++;
+          errors.push({ row: rowNumber, error: `Invalid ObjectId: ${idValue}` });
+        }
       });
 
       // Skip empty worksheets (no data rows)
@@ -97,22 +107,19 @@ export default async function handler(req, res) {
 
       console.log(`Processing ${worksheet.name} with ${rowsToProcess.length} rows...`);
 
-      // Process each row sequentially
-      for (const { row, rowNumber } of rowsToProcess) {
-        const idValue = row.getCell(idColumnIndex).value;
-        
-        try {
-          // Convert _id to ObjectId
-          let objectId;
-          try {
-            objectId = ObjectId.createFromHexString(idValue);
-          } catch (e) {
-            console.log(`Invalid ObjectId in row ${rowNumber}: ${idValue}`);
-            errorCount++;
-            errors.push({ row: rowNumber, error: `Invalid ObjectId: ${idValue}` });
-            continue;
-          }
+      // Delete items from database that are not in the Excel file
+      const deleteResult = await collection.deleteMany({
+        _id: { $nin: excelIds }
+      });
+      
+      if (deleteResult.deletedCount > 0) {
+        deletedCount += deleteResult.deletedCount;
+        console.log(`Deleted ${deleteResult.deletedCount} items from ${worksheet.name} that were not in Excel`);
+      }
 
+      // Process each row sequentially
+      for (const { row, rowNumber, objectId } of rowsToProcess) {
+        try {
           // Build update document from row data
           const updateDoc = {
             _id: objectId // Ensure _id is set for upsert
@@ -136,6 +143,8 @@ export default async function handler(req, res) {
                 fieldName.includes('depth') || fieldName.includes('thickness') ||
                 fieldName.includes('meter')) {
               updateDoc[fieldName] = Number(value) || 0;
+            } else if (fieldName === 'name') {
+              updateDoc[fieldName] = value ? String(value).toUpperCase() : value;
             } else {
               updateDoc[fieldName] = value;
             }
@@ -173,12 +182,13 @@ export default async function handler(req, res) {
     // Clean up uploaded file
     await fs.unlink(uploadedFile.filepath);
 
-    console.log(`Import completed: ${updatedCount} updated, ${errorCount} errors`);
+    console.log(`Import completed: ${updatedCount} updated, ${deletedCount} deleted, ${errorCount} errors`);
 
     res.status(200).json({
       success: true,
-      message: `Import completed. Updated ${updatedCount} records.`,
+      message: `Import completed. Updated ${updatedCount} records, deleted ${deletedCount} records.`,
       updatedCount,
+      deletedCount,
       errorCount,
       errors: errors.length > 0 ? errors : undefined
     });

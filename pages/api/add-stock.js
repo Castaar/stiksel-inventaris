@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ message: 'Stock updated successfully' });
       } else {
         const newProduct = {
-          name: name || '',
+          name: name ? name.toUpperCase() : '',
           unit: unit || '',
           format: format || '',
           calculation_type: null, // "bord" || "stuk" || "rol_per_meter" || "rol_per_square_meter" || "total_rol_per_meter"
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       // }
 
       const newProduct = {
-        name: name || '',
+        name: name ? name.toUpperCase() : '',
         unit: unit || '',
         format: format || '',
         calculation_type: null, // "bord" || "stuk" || "rol_per_meter" || "rol_per_square_meter" || "total_rol_per_meter"

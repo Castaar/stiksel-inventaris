@@ -147,7 +147,7 @@ export default async function handler(req, res) {
     }
 
     const newProduct = {
-      name: name || '',
+      name: name ? name.toUpperCase() : '',
       unit: unit || '',
       format: format || '',
       calculation_type: calculation_type || 'bord', // Default to 'bord' for borden database

@@ -32,7 +32,7 @@ export default async (req, res) => {
 
     const updateDoc = {
       $set: {
-        name,
+        name: name ? name.toUpperCase() : name,
         available,
         format,
       },
