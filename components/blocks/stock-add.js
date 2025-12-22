@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { getCollectionDefaults } from '../../lib/collection-defaults';
+import { getCollectionDefaults, getCollectionItemNames } from '../../lib/collection-defaults';
 
 import styles from "../../styles/blocks/_product-add.module.scss";
 
@@ -12,6 +12,7 @@ export default function Dropdowns({ collections, products, toast, selectedOption
   const [selectedCollection, setSelectedCollection] = useState(router.query.collection || selectedOption || 'Selecteer');
   const [selectedProduct, setSelectedProduct] = useState(router.query.state || 'Selecteer');
   const [stockInput, setStockInput] = useState({});
+  const [availableItems, setAvailableItems] = useState([]);
 
   // Defensive checks for props
   const safeCollections = Array.isArray(collections) ? collections : [];
@@ -20,7 +21,9 @@ export default function Dropdowns({ collections, products, toast, selectedOption
   // Set default price when collection changes and user selects "new product"
   useEffect(() => {
     if (selectedCollection !== 'Selecteer' && selectedProduct === 'new') {
-      const defaults = getCollectionDefaults(`stock_${selectedCollection}`);
+      const defaults = getCollectionDefaults(selectedCollection);
+      const itemNames = getCollectionItemNames(selectedCollection);
+      setAvailableItems(itemNames);
       setStockInput(prev => ({
         ...prev,
         price: defaults.price_per_piece || defaults.price_per_meter || 0,
@@ -158,13 +161,25 @@ export default function Dropdowns({ collections, products, toast, selectedOption
                     className={styles["category-search"]}
                     placeholder="Omschrijving"
                     required
-                    onChange={(e) =>
+                    list="item-names"
+                    value={stockInput.name || ''}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      const defaults = getCollectionDefaults(selectedCollection, null, newName);
+                      
                       setStockInput((prev) => ({
                         ...prev,
-                        name: e.target.value,
-                      }))
-                    }
+                        name: newName,
+                        // Update price if found in defaults
+                        price: defaults.price_per_piece || defaults.price_per_meter || prev.price || 0,
+                      }));
+                    }}
                   />
+                  <datalist id="item-names">
+                    {availableItems.map((itemName, index) => (
+                      <option key={index} value={itemName} />
+                    ))}
+                  </datalist>
                 </div>
                 <div className={styles["category"]}>
                   <label className={styles["label"]}>Formaat m</label>
