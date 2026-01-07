@@ -82,5 +82,15 @@ export function middleware(request) {
 
 // Configure which routes should be protected
 export const config = {
-  matcher: '/:path*',
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - All files with common static extensions
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.svg|.*\\.ico|.*\\.webp|.*\\.woff|.*\\.woff2|.*\\.ttf|.*\\.eot|.*\\.json|.*\\.js|.*\\.css|.*\\.map).*)',
+  ],
 };
