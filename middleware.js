@@ -15,6 +15,7 @@ const WHITELISTED_IPS = [
   '137.184.7.246', // Production access (new)
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
+  '162.158.233.177', // localhost IPv4
 ];
 
 export function middleware(request) {
