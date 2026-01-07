@@ -14,8 +14,27 @@ export function middleware(request) {
   // TEMPORARY: Disable IP check - REMOVE THIS AFTER DEBUGGING
   // return NextResponse.next();
   
+  const pathname = request.nextUrl.pathname;
+  
+  // Skip IP check for static files and public assets
+  if (
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/images/') ||
+    pathname.startsWith('/icons/') ||
+    pathname.startsWith('/fonts/') ||
+    pathname.startsWith('/public/') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/manifest.json' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sw.js' ||
+    pathname.includes('/workbox-') ||
+    pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot)$/i)
+  ) {
+    return NextResponse.next();
+  }
+  
   // Allow access to the 403 page itself to avoid redirect loop
-  if (request.nextUrl.pathname === '/403') {
+  if (pathname === '/403') {
     return NextResponse.next();
   }
   
@@ -63,14 +82,5 @@ export function middleware(request) {
 
 // Configure which routes should be protected
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files (images, icons, fonts, etc.)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|icons|images|fonts|public|manifest.json|robots.txt|sw.js|workbox|.*\\.svg|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.webp|.*\\.ico).*)',
-  ],
+  matcher: '/:path*',
 };
