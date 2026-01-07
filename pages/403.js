@@ -1,7 +1,11 @@
 import Head from "next/head";
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 export default function Forbidden() {
+  const router = useRouter();
+  const { ip } = router.query;
+
   return (
     <>
       <Head>
@@ -29,6 +33,11 @@ export default function Forbidden() {
           Your IP address is not authorized to access this application. 
           Please contact your administrator if you believe this is an error.
         </p>
+        {ip && (
+          <p style={{ fontSize: '14px', color: '#999', marginTop: '20px', fontFamily: 'monospace' }}>
+            Detected IP: {ip}
+          </p>
+        )}
       </div>
     </>
   );

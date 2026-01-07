@@ -12,6 +12,7 @@ const WHITELISTED_IPS = [
 
 export function middleware(request) {
   // Get the IP address from the request
+  // On Vercel, x-forwarded-for contains the real client IP
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
   
@@ -22,6 +23,11 @@ export function middleware(request) {
   if (!ip) {
     ip = '127.0.0.1';
   }
+  
+  // Log the IP for debugging (visible in Vercel logs)
+  console.log('Incoming request from IP:', ip);
+  console.log('x-forwarded-for:', forwarded);
+  console.log('x-real-ip:', realIp);
   
   // Check if IP is whitelisted
   const isWhitelisted = WHITELISTED_IPS.some(whitelistedIp => {
@@ -35,8 +41,11 @@ export function middleware(request) {
       return NextResponse.next();
     }
     
-    // Redirect to 403 page
-    return NextResponse.redirect(new URL('/403', request.url));
+    console.log('Access denied for IP:', ip);
+    // Redirect to 403 page with IP info
+    const url = new URL('/403', request.url);
+    url.searchParams.set('ip', ip);
+    return NextResponse.redirect(url);
   }
   
   // If whitelisted, continue to the requested page
