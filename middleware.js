@@ -11,6 +11,9 @@ const WHITELISTED_IPS = [
 ];
 
 export function middleware(request) {
+  // TEMPORARY: Disable IP check - REMOVE THIS AFTER DEBUGGING
+  // return NextResponse.next();
+  
   // Allow access to the 403 page itself to avoid redirect loop
   if (request.nextUrl.pathname === '/403') {
     return NextResponse.next();
@@ -66,8 +69,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder files
+     * - public folder files (images, icons, fonts, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico|icons/|images/|fonts/|manifest.json|robots.txt|sw.js).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)|icons|images|fonts|manifest.json|robots.txt|sw.js|workbox).*)',
   ],
 };
