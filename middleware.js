@@ -11,30 +11,37 @@ const WHITELISTED_IPS = [
 ];
 
 export function middleware(request) {
-  // TEMPORARY: Disable IP check - REMOVE THIS AFTER DEBUGGING
-  // return NextResponse.next();
-  
   const pathname = request.nextUrl.pathname;
   
-  // Skip IP check for static files and public assets
+  // FIRST: Skip ALL static files and assets - do this before ANY other checks
   if (
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/images/') ||
-    pathname.startsWith('/icons/') ||
-    pathname.startsWith('/fonts/') ||
-    pathname.startsWith('/public/') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/images') ||
+    pathname.startsWith('/icons') ||
+    pathname.startsWith('/fonts') ||
+    pathname.startsWith('/public') ||
+    pathname.includes('workbox') ||
     pathname === '/favicon.ico' ||
     pathname === '/manifest.json' ||
     pathname === '/robots.txt' ||
     pathname === '/sw.js' ||
-    pathname.includes('/workbox-') ||
-    pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot)$/i)
+    pathname === '/403' ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.jpeg') ||
+    pathname.endsWith('.gif') ||
+    pathname.endsWith('.svg') ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.webp') ||
+    pathname.endsWith('.woff') ||
+    pathname.endsWith('.woff2') ||
+    pathname.endsWith('.ttf') ||
+    pathname.endsWith('.eot') ||
+    pathname.endsWith('.css') ||
+    pathname.endsWith('.js') ||
+    pathname.endsWith('.json') ||
+    pathname.endsWith('.map')
   ) {
-    return NextResponse.next();
-  }
-  
-  // Allow access to the 403 page itself to avoid redirect loop
-  if (pathname === '/403') {
     return NextResponse.next();
   }
   
@@ -80,17 +87,9 @@ export function middleware(request) {
   return NextResponse.redirect(url);
 }
 
-// Configure which routes should be protected
+// Configure which routes the middleware runs on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - All files with common static extensions
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.svg|.*\\.ico|.*\\.webp|.*\\.woff|.*\\.woff2|.*\\.ttf|.*\\.eot|.*\\.json|.*\\.js|.*\\.css|.*\\.map).*)',
+    '/((?!_next/static|_next/image).*)',
   ],
 };
