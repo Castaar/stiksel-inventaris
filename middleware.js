@@ -28,17 +28,23 @@ export function middleware(request) {
     const ips = forwarded.split(',').map(ip => ip.trim());
     
     // Log all IPs in the chain for debugging
+    console.log('=== IP WHITELIST CHECK ===');
     console.log('x-forwarded-for chain:', ips);
     console.log('x-real-ip:', realIp);
+    console.log('Whitelisted IPs:', WHITELISTED_IPS);
     
     // Check if ANY IP in the forwarded chain is whitelisted
     // This handles cases where the client IP might be at different positions
     const whitelistedIp = ips.find(forwardedIp => 
-      WHITELISTED_IPS.some(allowedIp => forwardedIp === allowedIp)
+      WHITELISTED_IPS.some(allowedIp => {
+        const match = forwardedIp === allowedIp;
+        console.log(`Comparing: "${forwardedIp}" === "${allowedIp}" => ${match}`);
+        return match;
+      })
     );
     
     if (whitelistedIp) {
-      console.log('Whitelisted IP found in chain:', whitelistedIp);
+      console.log('✅ Whitelisted IP found in chain:', whitelistedIp);
       return NextResponse.next();
     }
     
@@ -49,7 +55,7 @@ export function middleware(request) {
   }
   
   // If we get here, no whitelisted IP was found
-  console.log('Access denied - no whitelisted IP found');
+  console.log('❌ Access denied - no whitelisted IP found');
   console.log('Client IP:', ip);
   
   // Allow access to the 403 page itself to avoid redirect loop
