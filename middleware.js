@@ -6,6 +6,10 @@ const WHITELISTED_IPS = [
   '94.224.96.186', // STIKSEL IP
   '109.128.14.194', // JONAS THUIS IP
   '109.137.150.164', // WOUTER THUIS IP
+  '64.23.245.241', // Production access
+  '143.198.132.45', // Production access
+  '64.23.177.195', // Production access
+  '64.23.146.85', // Production access
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
 ];
