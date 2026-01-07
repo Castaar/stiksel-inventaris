@@ -12,44 +12,51 @@ const WHITELISTED_IPS = [
 
 export function middleware(request) {
   // Get the IP address from the request
-  // On Vercel, x-forwarded-for contains the real client IP
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
   
-  // Extract IP address (handle multiple IPs in x-forwarded-for)
-  let ip = forwarded ? forwarded.split(',')[0].trim() : realIp;
+  let ip;
   
-  // Fallback to localhost if no IP is found (development)
-  if (!ip) {
-    ip = '127.0.0.1';
-  }
-  
-  // Log the IP for debugging (visible in Vercel logs)
-  console.log('Incoming request from IP:', ip);
-  console.log('x-forwarded-for:', forwarded);
-  console.log('x-real-ip:', realIp);
-  
-  // Check if IP is whitelisted
-  const isWhitelisted = WHITELISTED_IPS.some(whitelistedIp => {
-    return ip === whitelistedIp || ip.includes(whitelistedIp);
-  });
-  
-  // If IP is not whitelisted, redirect to 403 page
-  if (!isWhitelisted) {
-    // Allow access to the 403 page itself to avoid redirect loop
-    if (request.nextUrl.pathname === '/403') {
+  if (forwarded) {
+    // x-forwarded-for can contain multiple IPs: "client, proxy1, proxy2"
+    // The LAST IP before Vercel is usually the real client IP when behind Cloudflare
+    // But we need to check all IPs in the chain
+    const ips = forwarded.split(',').map(ip => ip.trim());
+    
+    // Log all IPs in the chain for debugging
+    console.log('x-forwarded-for chain:', ips);
+    console.log('x-real-ip:', realIp);
+    
+    // Check if ANY IP in the forwarded chain is whitelisted
+    // This handles cases where the client IP might be at different positions
+    const whitelistedIp = ips.find(forwardedIp => 
+      WHITELISTED_IPS.some(allowedIp => forwardedIp === allowedIp)
+    );
+    
+    if (whitelistedIp) {
+      console.log('Whitelisted IP found in chain:', whitelistedIp);
       return NextResponse.next();
     }
     
-    console.log('Access denied for IP:', ip);
-    // Redirect to 403 page with IP info
-    const url = new URL('/403', request.url);
-    url.searchParams.set('ip', ip);
-    return NextResponse.redirect(url);
+    // Use the first IP for logging (original client)
+    ip = ips[0];
+  } else {
+    ip = realIp || '127.0.0.1';
   }
   
-  // If whitelisted, continue to the requested page
-  return NextResponse.next();
+  // If we get here, no whitelisted IP was found
+  console.log('Access denied - no whitelisted IP found');
+  console.log('Client IP:', ip);
+  
+  // Allow access to the 403 page itself to avoid redirect loop
+  if (request.nextUrl.pathname === '/403') {
+    return NextResponse.next();
+  }
+  
+  // Redirect to 403 page with IP info
+  const url = new URL('/403', request.url);
+  url.searchParams.set('ip', ip);
+  return NextResponse.redirect(url);
 }
 
 // Configure which routes should be protected
