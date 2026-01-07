@@ -6,70 +6,55 @@ const WHITELISTED_IPS = [
   '94.224.96.186', // STIKSEL IP
   '109.128.14.194', // JONAS THUIS IP
   '109.137.150.164', // WOUTER THUIS IP
-  '64.23.245.241', // Production access
-  '143.198.132.45', // Production access
-  '64.23.177.195', // Production access
-  '64.23.146.85', // Production access
-  '143.110.145.227', // Production access (new)
-  '64.23.132.12', // Production access (new)
-  '137.184.7.246', // Production access (new)
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
-  '162.158.233.177', // localhost IPv4
 ];
 
 export function middleware(request) {
-  // Get the IP address from the request
-  const forwarded = request.headers.get('x-forwarded-for');
-  const realIp = request.headers.get('x-real-ip');
-  
-  let ip;
-  
-  if (forwarded) {
-    // x-forwarded-for can contain multiple IPs: "client, proxy1, proxy2"
-    // The LAST IP before Vercel is usually the real client IP when behind Cloudflare
-    // But we need to check all IPs in the chain
-    const ips = forwarded.split(',').map(ip => ip.trim());
-    
-    // Log all IPs in the chain for debugging
-    console.log('=== IP WHITELIST CHECK ===');
-    console.log('x-forwarded-for chain:', ips);
-    console.log('x-real-ip:', realIp);
-    console.log('Whitelisted IPs:', WHITELISTED_IPS);
-    
-    // Check if ANY IP in the forwarded chain is whitelisted
-    // This handles cases where the client IP might be at different positions
-    const whitelistedIp = ips.find(forwardedIp => 
-      WHITELISTED_IPS.some(allowedIp => {
-        const match = forwardedIp === allowedIp;
-        console.log(`Comparing: "${forwardedIp}" === "${allowedIp}" => ${match}`);
-        return match;
-      })
-    );
-    
-    if (whitelistedIp) {
-      console.log('✅ Whitelisted IP found in chain:', whitelistedIp);
-      return NextResponse.next();
-    }
-    
-    // Use the first IP for logging (original client)
-    ip = ips[0];
-  } else {
-    ip = realIp || '127.0.0.1';
-  }
-  
-  // If we get here, no whitelisted IP was found
-  console.log('❌ Access denied - no whitelisted IP found');
-  console.log('Client IP:', ip);
-  
   // Allow access to the 403 page itself to avoid redirect loop
   if (request.nextUrl.pathname === '/403') {
     return NextResponse.next();
   }
   
+  // Get the REAL client IP - Cloudflare sends this in CF-Connecting-IP
+  const cfConnectingIp = request.headers.get('cf-connecting-ip');
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  
+  // Cloudflare's CF-Connecting-IP is the most reliable for real client IP
+  let clientIp = cfConnectingIp;
+  
+  if (!clientIp && forwarded) {
+    // Fallback: first IP in x-forwarded-for chain
+    clientIp = forwarded.split(',')[0].trim();
+  }
+  
+  if (!clientIp) {
+    clientIp = realIp || '127.0.0.1';
+  }
+  
+  // Log all headers for debugging
+  console.log('=== IP WHITELIST CHECK ===');
+  console.log('CF-Connecting-IP:', cfConnectingIp);
+  console.log('X-Forwarded-For:', forwarded);
+  console.log('X-Real-IP:', realIp);
+  console.log('Client IP (resolved):', clientIp);
+  
+  // Check if IP is whitelisted
+  const isWhitelisted = WHITELISTED_IPS.includes(clientIp);
+  
+  if (isWhitelisted) {
+    console.log('✅ Access granted for IP:', clientIp);
+    return NextResponse.next();
+  }
+  
+  // Access denied
+  console.log('❌ Access denied for IP:', clientIp);
+  console.log('Whitelisted IPs:', WHITELISTED_IPS);
+  
   // Redirect to 403 page with IP info
   const url = new URL('/403', request.url);
-  url.searchParams.set('ip', ip);
+  url.searchParams.set('ip', clientIp);
   return NextResponse.redirect(url);
 }
 
