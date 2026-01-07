@@ -10,6 +10,9 @@ const WHITELISTED_IPS = [
   '143.198.132.45', // Production access
   '64.23.177.195', // Production access
   '64.23.146.85', // Production access
+  '143.110.145.227', // Production access (new)
+  '64.23.132.12', // Production access (new)
+  '137.184.7.246', // Production access (new)
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
 ];
