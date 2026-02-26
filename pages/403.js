@@ -9,7 +9,7 @@ export default function Forbidden() {
   return (
     <>
       <Head>
-        <title>Access Denied - Castaar Inventaris</title>
+        <title>Access Denied - Stiksel Inventaris</title>
       </Head>
       <div style={{
         display: 'flex',
@@ -22,7 +22,7 @@ export default function Forbidden() {
       }}>
         <Image
           src="/images/logo-castaar.svg"
-          alt="Logo Castaar"
+          alt="Logo Stiksel"
           width={230}
           height={34}
           style={{ marginBottom: '40px' }}

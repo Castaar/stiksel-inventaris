@@ -4,13 +4,11 @@ import { NextResponse } from 'next/server';
 const WHITELISTED_IPS = [
   '213.214.40.251', // CASTAAR IP
   '94.224.96.186', // STIKSEL IP
-  '109.128.14.194', // JONAS THUIS IP
-  '109.137.150.164', // WOUTER THUIS IP
   '::1', // localhost IPv6
   '127.0.0.1', // localhost IPv4
 ];
 
-export function middleware(request) {
+export function proxy(request) {
   const pathname = request.nextUrl.pathname;
   
   // FIRST: Skip ALL static files and assets - do this before ANY other checks
@@ -62,24 +60,12 @@ export function middleware(request) {
     clientIp = realIp || '127.0.0.1';
   }
   
-  // Log all headers for debugging
-  console.log('=== IP WHITELIST CHECK ===');
-  console.log('CF-Connecting-IP:', cfConnectingIp);
-  console.log('X-Forwarded-For:', forwarded);
-  console.log('X-Real-IP:', realIp);
-  console.log('Client IP (resolved):', clientIp);
-  
   // Check if IP is whitelisted
   const isWhitelisted = WHITELISTED_IPS.includes(clientIp);
   
   if (isWhitelisted) {
-    console.log('✅ Access granted for IP:', clientIp);
     return NextResponse.next();
   }
-  
-  // Access denied
-  console.log('❌ Access denied for IP:', clientIp);
-  console.log('Whitelisted IPs:', WHITELISTED_IPS);
   
   // Redirect to 403 page with IP info
   const url = new URL('/403', request.url);
@@ -87,7 +73,7 @@ export function middleware(request) {
   return NextResponse.redirect(url);
 }
 
-// Configure which routes the middleware runs on
+// Configure which routes the proxy runs on
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image).*)',

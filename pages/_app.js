@@ -2,19 +2,12 @@ import Head from "next/head";
 import Image from 'next/image';
 
 import "../styles/globals.scss";
-import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/router";
 
 import { Toaster } from "react-hot-toast";
 
 export default function myApp({ Component, pageProps }) {
-  const [navActive, setNavActive] = useState(false);
   const router = useRouter();
-
-  const handleToggleNav = () => {
-    setNavActive(!navActive);
-  };
 
   return (
     <>
@@ -26,9 +19,8 @@ export default function myApp({ Component, pageProps }) {
           name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
         />
-        <meta name="description" content="Description" />
-        <meta name="keywords" content="Keywords" />
-        <title>Castaar Inventaris</title>
+        <meta name="description" content="Stiksel stock inventaris" />
+        <title>Stiksel Inventaris</title>
 
         <link rel="manifest" href="/manifest.json" />
         <link
@@ -50,42 +42,12 @@ export default function myApp({ Component, pageProps }) {
         <a href="/">
           <Image
             src="/images/logo-castaar.svg"
-            alt="Logo Castaar"
+            alt="Logo Stiksel"
             width={230}
             height={34}
           />
         </a>
-        <span onClick={handleToggleNav}>
-          <svg
-            id="icon_menu"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 35.99 36.069"
-          >
-            <path
-              id="Path_52172"
-              data-name="Path 52172"
-              d="M25.147,0,16.97,8.176,8.725,0,0,8.794,8.176,16.97,0,25.147l8.726,8.795L16.97,25.7l8.176,8.245,8.726-8.795L25.7,16.97l8.176-8.176Z"
-              transform="translate(1.059 1.063)"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            ></path>
-          </svg>
-        </span>
       </header>
-      {navActive && (
-        <nav className="navigation">
-          <Link href="/" onClick={handleToggleNav}>
-            Home
-          </Link>
-          <Link href="/stock" onClick={handleToggleNav}>
-            Stock
-          </Link>
-          <Link href="/borden" onClick={handleToggleNav}>
-            Borden
-          </Link>
-        </nav>
-      )}
       <Component {...pageProps} key={router.asPath} />
     </>
   );
