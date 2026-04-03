@@ -68,19 +68,21 @@ export default function CollectionPage({ database, collection, documents = [] })
 
         {adding && (
           <form className="detail" onSubmit={handleSubmit}>
-            {Object.entries(EMPTY_FORM).map(([key]) => (
-              <div key={key} className="detail-row">
-                <label htmlFor={key}>{key === "refnr" ? "Refnr" : key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                <input
-                  id={key}
-                  name={key}
-                  value={form[key]}
-                  onChange={handleChange}
-                  required={key === "refnr"}
-                />
-              </div>
-            ))}
+            <div>
+              {Object.entries(EMPTY_FORM).map(([key]) => (
+                <div key={key} className="detail-row">
+                  <label htmlFor={key}>{key === "refnr" ? "Refnr" : key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                  <input
+                    id={key}
+                    name={key}
+                    value={form[key]}
+                    onChange={handleChange}
+                    required={key === "refnr"}
+                  />
+                </div>
+              ))}
             {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
             <div className="detail-actions">
               <button type="submit" disabled={saving}>{saving ? "Toevoegen..." : "Toevoegen"}</button>
               <button type="button" onClick={handleCancel} disabled={saving}>Annuleren</button>
@@ -96,7 +98,7 @@ export default function CollectionPage({ database, collection, documents = [] })
           </div>
           {documents.map((document, index) => (
             <div key={index}>
-              <Link className={styles["document-item"]} href={`/${database}/${collection}/${document.refnr}-${(document.kleur ?? '').charAt(0)}`}>
+              <Link className={styles["document-item"]} href={`/${database}/${collection}/${document.refnr}-${(document.kleur ?? '').split(/\s+/).map(w => w.charAt(0)).join('')}`}>
                 <p>{document.refnr} - {document.modelnaam}</p>
                 <p>{document.stock}</p>
                 <p>{document.akp}</p>

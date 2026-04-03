@@ -71,7 +71,6 @@ export default function DocumentPage({ database, collection, document: doc, slug
       <main className="main">
         <div className="main-title">
           <h1>{form.modelnaam}</h1>
-          <p>{refnr}</p>
         </div>
         <div className="detail">
           {fields.map(({ key, label }) => {
@@ -122,12 +121,13 @@ export async function getServerSideProps({ params }) {
   const lastDash = slug.lastIndexOf('-');
   const refnr = slug.substring(0, lastDash);
   const colorInitial = slug.substring(lastDash + 1).replace(/[^a-z]/g, '');
+  const colorRegex = colorInitial.split('').map((c, i) => i === 0 ? `^${c}\\w*` : `\\s+${c}\\w*`).join('');
 
   try {
     const client = await clientPromise;
     const db = client.db(database);
 
-    const query = { refnr, ...(colorInitial ? { kleur: { $regex: `^${colorInitial}` } } : {}) };
+    const query = { refnr, ...(colorInitial ? { kleur: { $regex: colorRegex } } : {}) };
     const raw = await db.collection(collection).findOne(query);
 
     if (!raw) {
