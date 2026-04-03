@@ -15,12 +15,40 @@ const EMPTY_FORM = {
   akp: "",
 };
 
-export default function CollectionPage({ database, collection, documents = [] }) {
+export default function CollectionPage({ database, collection, documents = [], duplicateIds = [] }) {
+  const dupSet = new Set(duplicateIds);
   const router = useRouter();
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState(null);
+  const fileInputRef = React.useRef(null);
+
+  async function handleImport(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    setImportMsg(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/${database}/${collection}/import`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok && res.status !== 207) throw new Error(data.error ?? "Import mislukt");
+      setImportMsg(`${data.inserted} rijen toegevoegd${data.warning ? " (" + data.warning + ")" : ""}`);
+      router.replace(router.asPath);
+    } catch (e) {
+      setImportMsg(e.message);
+    } finally {
+      setImporting(false);
+      e.target.value = "";
+    }
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -64,7 +92,18 @@ export default function CollectionPage({ database, collection, documents = [] })
         <div className="main-title">
           <h1>{collection}</h1>
           <button onClick={() => setAdding(true)}>Nieuw toevoegen</button>
+          <button onClick={() => fileInputRef.current?.click()} disabled={importing}>
+            {importing ? "Importeren..." : "CSV importeren"}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            style={{ display: "none" }}
+            onChange={handleImport}
+          />
         </div>
+        {importMsg && <p style={{ marginBottom: "1rem" }}>{importMsg}</p>}
 
         {adding && (
           <form className="detail" onSubmit={handleSubmit}>
@@ -93,12 +132,12 @@ export default function CollectionPage({ database, collection, documents = [] })
         <div className={styles["document"]}>
           <div className={styles["document-item"]}>
             <p>Refnr</p>
-            <p>Modelnaam</p>
+            <p>Stock</p>
             <p>AKP</p>
           </div>
           {documents.map((document, index) => (
-            <div key={index}>
-              <Link className={styles["document-item"]} href={`/${database}/${collection}/${document.refnr}-${(document.kleur ?? '').split(/\s+/).map(w => w.charAt(0)).join('')}`}>
+            <div key={index} style={dupSet.has(document._id) ? { color: "red" } : undefined}>
+              <Link className={styles["document-item"]} href={`/${database}/${collection}/${document.refnr}-${(document.kleur ?? '').trim().split(/\s+/).filter(w => /^[a-zA-Z]/.test(w)).map(w => w.charAt(0)).join('')}`}>
                 <p>{document.refnr} - {document.modelnaam}</p>
                 <p>{document.stock}</p>
                 <p>{document.akp}</p>
@@ -121,7 +160,16 @@ export async function getServerSideProps({ params }) {
     const rawDocuments = await db.collection(collection).find({}).toArray();
     const documents = JSON.parse(JSON.stringify(rawDocuments));
 
-    return { props: { database, collection, documents } };
+    // Detect duplicates: documents where all relevant fields match another document
+    const sigMap = new Map();
+    documents.forEach((doc) => {
+      const sig = [doc.refnr, doc.kleur, doc.modelnaam, doc.gender, doc.maat, doc.stock, doc.akp].join("|");
+      if (!sigMap.has(sig)) sigMap.set(sig, []);
+      sigMap.get(sig).push(doc._id);
+    });
+    const duplicateIds = [...sigMap.values()].filter((ids) => ids.length > 1).flat();
+
+    return { props: { database, collection, documents, duplicateIds } };
   } catch (e) {
     console.error(`[${database}/${collection}] getServerSideProps error:`, e.message);
     return { props: { database, collection, documents: [] } };

@@ -120,14 +120,16 @@ export async function getServerSideProps({ params }) {
   const { database, collection, refnr: slug } = params;
   const lastDash = slug.lastIndexOf('-');
   const refnr = slug.substring(0, lastDash);
-  const colorInitial = slug.substring(lastDash + 1).replace(/[^a-z]/g, '');
-  const colorRegex = colorInitial.split('').map((c, i) => i === 0 ? `^${c}\\w*` : `\\s+${c}\\w*`).join('');
+  const colorInitial = slug.substring(lastDash + 1).replace(/[^a-z]/gi, '');
+  const colorRegex = colorInitial.length > 1
+    ? colorInitial.split('').map((c, i) => i === 0 ? `^${c}\\w*` : `\\s+${c}\\w*`).join('')
+    : `^${colorInitial}`;
 
   try {
     const client = await clientPromise;
     const db = client.db(database);
 
-    const query = { refnr, ...(colorInitial ? { kleur: { $regex: colorRegex } } : {}) };
+    const query = { refnr, ...(colorInitial ? { kleur: { $regex: colorRegex, $options: 'i' } } : {}) };
     const raw = await db.collection(collection).findOne(query);
 
     if (!raw) {

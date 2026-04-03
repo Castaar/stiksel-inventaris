@@ -92,16 +92,9 @@ export async function getServerSideProps({ params }) {
 
     const collectionList = await db.listCollections().toArray();
 
-    const collections = await Promise.all(
-      collectionList.map(async (col) => {
-        const documents = await db.collection(col.name).find({}).toArray();
-
-        return {
-          collection: col.name,
-          documents: JSON.parse(JSON.stringify(documents)),
-        };
-      })
-    );
+    const collections = collectionList
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((col) => ({ collection: col.name }));
 
     return { props: { database, collections } };
   } catch (e) {
