@@ -1,0 +1,13 @@
+@import "../variables";
+
+.document {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 20px;
+  &-item {
+    color: black;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

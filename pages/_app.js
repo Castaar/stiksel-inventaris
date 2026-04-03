@@ -3,15 +3,13 @@ import Image from 'next/image';
 
 import "../styles/globals.scss";
 import { useRouter } from "next/router";
-
-import { Toaster } from "react-hot-toast";
+import Link from "next/link";
 
 export default function myApp({ Component, pageProps }) {
   const router = useRouter();
 
   return (
     <>
-      <Toaster position="bottom-center" />
       <Head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -39,14 +37,15 @@ export default function myApp({ Component, pageProps }) {
         <meta name="theme-color" content="#317EFB" />
       </Head>
       <header className="header">
-        <a href="/">
+        <Link href="/">
           <Image
-            src="/images/logo-castaar.svg"
+            src="/images/logo-stiksel.svg"
             alt="Logo Stiksel"
-            width={230}
-            height={34}
+            width={125}
+            height={38}
+            priority
           />
-        </a>
+        </Link>
       </header>
       <Component {...pageProps} key={router.asPath} />
     </>
