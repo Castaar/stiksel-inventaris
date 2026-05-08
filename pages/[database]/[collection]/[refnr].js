@@ -72,7 +72,7 @@ export default function DocumentPage({ database, collection, document: doc, slug
         <div className="main-title">
           <h1>{form.modelnaam}</h1>
         </div>
-        <div className="detail">
+        <div className={`detail${editing ? "" : " detail--view"}`}>
           {fields.map(({ key, label }) => {
             const value = form[key];
             if (value === undefined || value === null || value === "") return null;
@@ -91,10 +91,12 @@ export default function DocumentPage({ database, collection, document: doc, slug
               </div>
             );
           })}
-          <div className="detail-row">
-            <span>Totale waarde</span>
-            <span>€ {(Number(form.akp) * Number(form.stock)).toFixed(2)}</span>
-          </div>
+          {!editing && (
+            <div className="detail-row">
+              <span>Totale waarde</span>
+              <span>€ {(Number(form.akp) * Number(form.stock)).toFixed(2)}</span>
+            </div>
+          )}
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="detail-actions">

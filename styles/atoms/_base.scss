@@ -40,11 +40,28 @@ a {
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.4rem;
   }
   &-actions {
     display: flex;
     gap: 1rem;
+  }
+
+  &--view {
+    .detail-row {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      gap: 0;
+
+      span:first-child {
+        opacity: 0.5;
+        font-size: 0.85rem;
+      }
+    }
   }
 }
 
@@ -61,5 +78,24 @@ button {
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+input {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid black;
+  border-radius: 50px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  width: 100%;
+
+  &::placeholder {
+    color: $gray-400;
+  }
+
+  &:focus {
+    border-color: black;
   }
 }
