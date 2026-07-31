@@ -9,6 +9,7 @@ export default function DocumentPage({ database, collection, document: doc, slug
   const [form, setForm] = useState(doc ?? {});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   if (!doc) {
     return (
@@ -51,6 +52,25 @@ export default function DocumentPage({ database, collection, document: doc, slug
     setForm(doc);
     setEditing(false);
     setError(null);
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(`Weet je zeker dat je ${refnr} wilt verwijderen?`)) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/${database}/${collection}/${encodeURIComponent(slug)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Verwijderen mislukt");
+      }
+      router.push(`/${database}/${collection}`);
+    } catch (e) {
+      setError(e.message);
+      setDeleting(false);
+    }
   }
 
   const fields = [
@@ -110,7 +130,12 @@ export default function DocumentPage({ database, collection, document: doc, slug
               </button>
             </>
           ) : (
-            <button onClick={() => setEditing(true)}>Bewerken</button>
+            <>
+              <button onClick={() => setEditing(true)}>Bewerken</button>
+              <button onClick={handleDelete} disabled={deleting}>
+                {deleting ? "Verwijderen..." : "Verwijderen"}
+              </button>
+            </>
           )}
         </div>
       </main>

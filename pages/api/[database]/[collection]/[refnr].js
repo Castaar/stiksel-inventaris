@@ -1,7 +1,7 @@
 import clientPromise from "../../../../lib/mongodb";
 
 export default async function handler(req, res) {
-  if (req.method !== "PUT") {
+  if (req.method !== "PUT" && req.method !== "DELETE") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -12,6 +12,26 @@ export default async function handler(req, res) {
   const colorRegex = colorInitial.length > 1
     ? colorInitial.split('').map((c, i) => i === 0 ? `^${c}\w*` : `\s+${c}\w*`).join('')
     : `^${colorInitial}`;
+
+  if (req.method === "DELETE") {
+    try {
+      const client = await clientPromise;
+      const db = client.db(database);
+
+      const query = { refnr, ...(colorInitial ? { kleur: { $regex: colorRegex, $options: 'i' } } : {}) };
+      const result = await db.collection(collection).deleteOne(query);
+
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ error: "Document niet gevonden" });
+      }
+
+      return res.status(200).json({ ok: true });
+    } catch (e) {
+      console.error(`[API DELETE ${database}/${collection}/${refnr}] error:`, e.message);
+      return res.status(500).json({ error: "Interne serverfout" });
+    }
+  }
+
   const updates = req.body;
 
   if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
