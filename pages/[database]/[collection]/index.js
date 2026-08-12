@@ -8,6 +8,7 @@ import Link from "next/link";
 const EMPTY_FORM = {
   refnr: "",
   modelnaam: "",
+  merk: "",
   kleur: "",
   gender: "",
   maat: "",
@@ -23,7 +24,7 @@ function slugFor(doc) {
 }
 
 function toCSV(documents) {
-  const headers = ["refnr", "modelnaam", "kleur", "gender", "maat", "stock", "akp"];
+  const headers = ["refnr", "modelnaam", "merk", "kleur", "gender", "maat", "stock", "akp"];
   const rows = documents.map((doc) => headers.map((h) => doc[h] ?? "").join(","));
   return [headers.join(","), ...rows].join("\n");
 }
@@ -217,6 +218,7 @@ export default function CollectionPage({ database, collection, documents: initia
         <div className={styles["document"]}>
           <div className={styles["document-item"]}>
             <p className="cursor-pointer" onClick={() => handleSort("refnr")}>Refnr {sortKey === "refnr" ? (sortDir === 1 ? "▲" : "▼") : ""}</p>
+            <p className="cursor-pointer" onClick={() => handleSort("merk")}>Merk {sortKey === "merk" ? (sortDir === 1 ? "▲" : "▼") : ""}</p>
             <p className="cursor-pointer" onClick={() => handleSort("stock")}>Stock {sortKey === "stock" ? (sortDir === 1 ? "▲" : "▼") : ""}</p>
             <p className="cursor-pointer" onClick={() => handleSort("akp")}>AKP {sortKey === "akp" ? (sortDir === 1 ? "▲" : "▼") : ""}</p>
           </div>
@@ -234,6 +236,7 @@ export default function CollectionPage({ database, collection, documents: initia
               >
                 <Link className={styles["document-item"]} href={`/${database}/${collection}/${slugFor(document)}`}>
                   <p>{document.refnr} - {document.modelnaam}</p>
+                  <p>{document.merk}</p>
                   <p>{document.stock}{isLow && !isDup ? " ⚠" : ""}</p>
                   <p>{document.akp}</p>
                 </Link>
@@ -275,7 +278,7 @@ export async function getServerSideProps({ params }) {
     // Detect duplicates: documents where all relevant fields match another document
     const sigMap = new Map();
     documents.forEach((doc) => {
-      const sig = [doc.refnr, doc.kleur, doc.modelnaam, doc.gender, doc.maat, doc.stock, doc.akp].join("|");
+      const sig = [doc.refnr, doc.kleur, doc.modelnaam, doc.merk, doc.gender, doc.maat, doc.stock, doc.akp].join("|");
       if (!sigMap.has(sig)) sigMap.set(sig, []);
       sigMap.get(sig).push(doc._id);
     });

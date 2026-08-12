@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   const { _id, ...safeDoc } = doc;
 
-  const textFields = ["refnr", "modelnaam", "kleur", "gender", "maat"];
+  const textFields = ["refnr", "modelnaam", "merk", "kleur", "gender", "maat"];
   for (const field of textFields) {
     if (typeof safeDoc[field] === "string") safeDoc[field] = safeDoc[field].toLowerCase();
   }

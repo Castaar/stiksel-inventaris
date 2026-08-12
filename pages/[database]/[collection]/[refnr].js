@@ -76,6 +76,7 @@ export default function DocumentPage({ database, collection, document: doc, slug
   const fields = [
     { key: "refnr", label: "Refnr" },
     { key: "modelnaam", label: "Modelnaam" },
+    { key: "merk", label: "Merk" },
     { key: "kleur", label: "Kleur" },
     { key: "gender", label: "Gender" },
     { key: "maat", label: "Maat" },

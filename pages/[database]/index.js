@@ -11,6 +11,60 @@ export default function DatabasePage({ database, collections = [] }) {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState(null);
+  const [cleaning, setCleaning] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  function handleExport() {
+    window.location.href = `/api/${database}/export`;
+  }
+
+  async function handleClean() {
+    if (
+      !window.confirm(
+        `Weet je zeker dat je ALLE collecties in "${database}" wilt verwijderen? Dit kan niet ongedaan gemaakt worden.`
+      )
+    )
+      return;
+    setCleaning(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`/api/${database}/clean`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Leegmaken mislukt");
+      setImportMsg(`Database leeggemaakt (${data.dropped.length} collectie(s) verwijderd)`);
+      router.replace(router.asPath);
+    } catch (e) {
+      setImportMsg(e.message);
+    } finally {
+      setCleaning(false);
+    }
+  }
+
+  async function handleImport(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    setImportMsg(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/${database}/import`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok && res.status !== 207) throw new Error(data.error ?? "Import mislukt");
+      setImportMsg(`${data.inserted} rijen toegevoegd${data.warning ? " (" + data.warning + ")" : ""}`);
+      router.replace(router.asPath);
+    } catch (e) {
+      setImportMsg(e.message);
+    } finally {
+      setImporting(false);
+      e.target.value = "";
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -49,7 +103,27 @@ export default function DatabasePage({ database, collections = [] }) {
         <div className="main-title">
           <h1>{database}</h1>
           <button onClick={() => setAdding(true)}>Nieuwe collectie</button>
+          <button onClick={() => fileInputRef.current?.click()} disabled={importing}>
+            {importing ? "Importeren..." : "CSV importeren"}
+          </button>
+          <button onClick={handleExport}>CSV exporteren</button>
+          <button
+            onClick={handleClean}
+            disabled={cleaning}
+            style={{ color: "red", borderColor: "red" }}
+            title="Tijdelijke knop om alle collecties in deze database te verwijderen"
+          >
+            {cleaning ? "Leegmaken..." : "⚠ Database leegmaken (tijdelijk)"}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            style={{ display: "none" }}
+            onChange={handleImport}
+          />
         </div>
+        {importMsg && <p style={{ marginBottom: "1rem" }}>{importMsg}</p>}
 
         {adding && (
           <form className="detail" onSubmit={handleSubmit}>

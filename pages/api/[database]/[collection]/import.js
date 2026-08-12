@@ -20,7 +20,7 @@ function parseCSV(text) {
   });
 }
 
-const textFields = ["refnr", "modelnaam", "kleur", "gender", "maat"];
+const textFields = ["refnr", "modelnaam", "merk", "kleur", "gender", "maat"];
 
 function sanitize(doc) {
   const out = { ...doc };

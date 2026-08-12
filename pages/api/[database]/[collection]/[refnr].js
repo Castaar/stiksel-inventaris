@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   // Strip _id to prevent overwriting it
   const { _id, ...safeUpdates } = updates;
 
-  const textFields = ["refnr", "modelnaam", "kleur", "gender", "maat"];
+  const textFields = ["refnr", "modelnaam", "merk", "kleur", "gender", "maat"];
   for (const field of textFields) {
     if (typeof safeUpdates[field] === "string") safeUpdates[field] = safeUpdates[field].toLowerCase();
   }
