@@ -267,7 +267,7 @@
   font-weight: 700;
 
   &:hover {
-    border-color: var(--accent);
+    background: var(--hover);
   }
 
   &[aria-current="true"] {

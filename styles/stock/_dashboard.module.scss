@@ -55,8 +55,8 @@
     justify-content: center;
     text-decoration: none;
 
-    &:hover .v {
-      color: var(--accent-text);
+    &:hover {
+      background: var(--hover);
     }
   }
 
@@ -118,7 +118,7 @@
   display: block;
 
   &:is(a, button):hover {
-    border-color: var(--accent);
+    background: var(--hover);
   }
 
   .n {
@@ -451,8 +451,8 @@
     place-items: center;
 
     &:hover:not(:disabled) {
-      border-color: var(--accent);
-      color: var(--accent-text);
+      background: var(--hover);
+      color: var(--hover-ink);
     }
   }
 }

@@ -25,6 +25,9 @@
   --ok: #2f7d4f;
   --warn: #9a6512;
   --warn-bg: rgba(218, 152, 78, 0.16);
+  // Light grey for hover states
+  --hover: #ececec;
+  --hover-ink: #000000;
   --radius: 3px;
   color-scheme: light;
   accent-color: var(--accent);
@@ -48,6 +51,8 @@
   --ok: #7cc493;
   --warn: #f0b46a;
   --warn-bg: rgba(218, 152, 78, 0.18);
+  --hover: #2b2b2b;
+  --hover-ink: #ffffff;
   color-scheme: dark;
 }
 
@@ -156,8 +161,8 @@ h2 {
   text-decoration: none;
 
   &:hover:not(:disabled) {
-    border-color: var(--accent);
-    color: var(--accent-text);
+    background: var(--hover);
+    color: var(--hover-ink);
   }
 
   &.primary {
@@ -167,9 +172,9 @@ h2 {
     font-weight: 600;
 
     &:hover:not(:disabled) {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--accent-ink);
+      background: var(--hover);
+      border-color: var(--line-strong);
+      color: var(--hover-ink);
     }
   }
 
@@ -195,8 +200,7 @@ h2 {
   flex: none;
 
   &:hover {
-    border-color: var(--accent);
-    color: var(--accent-text);
+    background: var(--hover);
   }
 }
 

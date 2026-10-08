@@ -26,7 +26,7 @@
   }
 
   &:hover {
-    border-color: var(--accent);
+    background: var(--hover);
     border-style: solid;
   }
 }

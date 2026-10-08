@@ -22,9 +22,22 @@ function toggleTheme() {
 export default function AppHeader({ tab, databases = [], search, onSearch, onSearchSubmit, onAdd, layout, onLayout, menu = [] }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dbOpen, setDbOpen] = useState(false);
   const menuRef = useRef(null);
+  const dbRef = useRef(null);
   const searchRef = useRef(null);
-  const tabs = [["overzicht", "Overzicht"], ...databases.map((db) => [db, label(db)]), ["recent", "Recent"]];
+  const dbActive = databases.includes(tab);
+  const tabLink = (key, title) => (
+    <Link
+      key={key}
+      href={key === "overzicht" ? "/" : { pathname: "/", query: { tab: key } }}
+      shallow
+      scroll={false}
+      aria-current={tab === key ? "page" : undefined}
+    >
+      {title}
+    </Link>
+  );
 
   // Apply the saved theme (an inline script before paint isn't allowed by the CSP)
   useEffect(() => {
@@ -37,9 +50,13 @@ export default function AppHeader({ tab, databases = [], search, onSearch, onSea
   useEffect(() => {
     const onClick = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      if (dbRef.current && !dbRef.current.contains(e.target)) setDbOpen(false);
     };
     const onKey = (e) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setDbOpen(false);
+      }
       const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName);
       if (e.key === "/" && !typing && searchRef.current) {
         e.preventDefault();
@@ -77,17 +94,42 @@ export default function AppHeader({ tab, databases = [], search, onSearch, onSea
         </Link>
         {tab && (
           <nav className={styles["tabs"]} aria-label="Weergave">
-            {tabs.map(([key, title]) => (
-              <Link
-                key={key}
-                href={key === "overzicht" ? "/" : { pathname: "/", query: { tab: key } }}
-                shallow
-                scroll={false}
-                aria-current={tab === key ? "page" : undefined}
-              >
-                {title}
-              </Link>
-            ))}
+            {tabLink("overzicht", "Overzicht")}
+            {/* The databases in a dropdown, so the header stays on one line */}
+            {databases.length > 0 && (
+              <div className={styles["dropdown"]} ref={dbRef}>
+                <button
+                  type="button"
+                  className={styles["tab-button"]}
+                  aria-expanded={dbOpen}
+                  aria-haspopup="true"
+                  aria-current={dbActive ? "page" : undefined}
+                  onClick={() => setDbOpen(!dbOpen)}
+                >
+                  {dbActive ? label(tab) : "Voorraad"}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                {dbOpen && (
+                  <div className={`${styles["menu-pop"]} ${styles["menu-pop-left"]}`}>
+                    {databases.map((db) => (
+                      <Link
+                        key={db}
+                        href={{ pathname: "/", query: { tab: db } }}
+                        shallow
+                        scroll={false}
+                        aria-current={tab === db ? "page" : undefined}
+                        onClick={() => setDbOpen(false)}
+                      >
+                        {label(db)}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {tabLink("recent", "Recent")}
           </nav>
         )}
         <div className={styles["spacer"]} />
@@ -105,7 +147,7 @@ export default function AppHeader({ tab, databases = [], search, onSearch, onSea
               onKeyDown={(e) => {
                 if (e.key === "Enter" && onSearchSubmit) onSearchSubmit(search);
               }}
-              placeholder={onSearchSubmit ? "Zoek of vraag, bv. 20 zwarte hoodies in M" : "Zoek op refnr, model, kleur of maat"}
+              placeholder={onSearchSubmit ? "Zoek of vraag, bv. 20 zwarte hoodies in M" : "Zoek op refnr, model of kleur"}
               aria-label="Zoeken"
               autoComplete="off"
             />
