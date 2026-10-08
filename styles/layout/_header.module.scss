@@ -1,0 +1,169 @@
+@use "../variables";
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 72px;
+  flex-wrap: wrap;
+  padding-block: 10px;
+
+  @include variables.sm-breakpoint {
+    gap: 10px;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  text-decoration: none;
+
+  svg {
+    height: 26px;
+    width: auto;
+    display: block;
+  }
+
+  @include variables.sm-breakpoint {
+    gap: 8px;
+
+    svg {
+      height: 21px;
+    }
+  }
+
+  small {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    line-height: 1;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+
+  a {
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-weight: 400;
+    text-decoration: none;
+    white-space: nowrap;
+    text-transform: capitalize;
+
+    &[aria-current="page"] {
+      color: var(--strong-ink);
+      background: var(--strong);
+    }
+
+    &:hover:not([aria-current="page"]) {
+      color: var(--ink);
+    }
+  }
+
+  @include variables.md-breakpoint {
+    order: 5;
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.search {
+  position: relative;
+  min-width: min(320px, 100%);
+
+  input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line-strong);
+    padding: 9px 4px 9px 30px;
+    outline: none;
+
+    &:focus {
+      border-bottom-color: var(--accent);
+    }
+  }
+
+  svg {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    stroke: var(--muted);
+  }
+
+  @include variables.md-breakpoint {
+    order: 6;
+    flex: 1 1 100%;
+  }
+}
+
+// Tiles / rows switch
+.layout {
+  button {
+    padding: 7px 11px;
+    display: grid;
+    place-items: center;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+  }
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 6px;
+  min-width: 240px;
+  z-index: 30;
+
+  button,
+  a {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--panel-2);
+    }
+  }
+}

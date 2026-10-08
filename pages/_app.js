@@ -1,53 +1,44 @@
 import Head from "next/head";
-import Image from 'next/image';
+import { useRouter } from "next/router";
+import localFont from "next/font/local";
+import { Toaster } from "react-hot-toast";
 
 import "../styles/globals.scss";
-import { useRouter } from "next/router";
-import Link from "next/link";
 
-export default function myApp({ Component, pageProps }) {
+// Gobold Lowplus Italic, the heading typeface of stiksel.com (one weight)
+const gobold = localFont({
+  src: [{ path: "../styles/fonts/Gobold-Lowplus-Italic.ttf", weight: "400", style: "normal" }],
+  variable: "--font-gobold",
+});
+
+export default function App({ Component, pageProps }) {
   const router = useRouter();
 
   return (
-    <>
+    <div className={`app ${gobold.variable}`}>
       <Head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="description" content="Stiksel stock inventaris" />
-        <title>Stiksel Inventaris</title>
+        <title>Stiksel Stock</title>
 
         <link rel="manifest" href="/manifest.json" />
-        <link
-          href="/icons/favicon-16x16.png"
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-        />
-        <link
-          href="/icons/favicon-32x32.png"
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-        />
-        <link rel="apple-touch-icon" href="/apple-icon.png"></link>
-        <meta name="theme-color" content="#317EFB" />
+        <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <meta name="theme-color" content="#ffffff" />
       </Head>
-      <header className="header">
-        <Link href="/">
-          <Image
-            src="/images/logo-stiksel.svg"
-            alt="Logo Stiksel"
-            width={125}
-            height={38}
-            priority
-          />
-        </Link>
-      </header>
-      <Component {...pageProps} key={router.asPath} />
-    </>
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: "var(--strong)",
+            color: "var(--strong-ink)",
+            borderRadius: "999px",
+            fontWeight: 600,
+          },
+          error: { style: { background: "var(--low)", color: "#fff" } },
+        }}
+      />
+      <Component {...pageProps} key={router.pathname} />
+    </div>
   );
 }

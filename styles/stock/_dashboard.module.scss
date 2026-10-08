@@ -1,0 +1,539 @@
+@use "../variables";
+
+// Hero with the total value
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  margin-top: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+
+  @include variables.md-breakpoint {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-main {
+  padding: clamp(22px, 3vw, 40px);
+  border-right: 1px solid var(--line);
+
+  @include variables.md-breakpoint {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+.hero-label {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.hero-value {
+  font-family: var(--font-display);
+  font-size: clamp(52px, 9vw, 120px);
+  line-height: 0.95;
+  margin: 14px 0 18px;
+  word-break: break-all;
+}
+
+.hero-note {
+  font-size: 14px;
+  color: var(--warn);
+}
+
+.hero-split {
+  display: grid;
+  grid-auto-rows: 1fr;
+
+  > a {
+    padding: 22px clamp(18px, 2.5vw, 32px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-decoration: none;
+
+    &:hover .v {
+      color: var(--accent-text);
+    }
+  }
+
+  > a + a {
+    border-top: 1px solid var(--line);
+  }
+
+  .v {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.2vw, 42px);
+    line-height: 1.1;
+    margin-top: 4px;
+  }
+
+  .s {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  > .s {
+    padding: 22px clamp(18px, 2.5vw, 32px);
+  }
+}
+
+.bar-split {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  overflow: hidden;
+  margin-top: 12px;
+  display: flex;
+
+  i {
+    display: block;
+    height: 100%;
+  }
+}
+
+// Key figures
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+
+  @include variables.sm-breakpoint {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.kpi {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: var(--panel);
+  text-align: left;
+  text-decoration: none;
+  display: block;
+
+  &:is(a, button):hover {
+    border-color: var(--accent);
+  }
+
+  .n {
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 1.1;
+  }
+
+  .l {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.kpi-alert .n {
+  color: var(--low);
+}
+
+.kpi-warn .n {
+  color: var(--warn);
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+// Sections
+
+.block {
+  margin-top: 40px;
+}
+
+.block-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+
+  h2 {
+    margin: 0;
+    font-size: 30px;
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .right {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+.chip-row {
+  margin-bottom: 8px;
+}
+
+.sort {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  font-size: 14px;
+
+  option {
+    background: var(--panel);
+    color: var(--ink);
+  }
+}
+
+.subhead {
+  margin: 28px 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+
+  > span {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 14px;
+  }
+}
+
+.subhead-add {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--accent-text);
+}
+
+// Product cards
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+// Rows: the same cards, one per line, with the columns lined up (model, colour and size, stock, value)
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 280px) 110px 190px;
+    align-items: center;
+    gap: 6px 24px;
+    padding: 12px 18px;
+
+    > div:first-of-type {
+      grid-column: 1;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+  }
+
+  .variant {
+    grid-column: 2;
+  }
+
+  .qty {
+    grid-column: 3;
+
+    b {
+      font-size: 28px;
+    }
+  }
+
+  .card-foot {
+    grid-column: 4;
+    grid-row: 1;
+    margin-top: 0;
+  }
+
+  @include variables.md-breakpoint {
+    .card {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      padding: 12px 14px;
+
+      > div:first-of-type {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .variant {
+      grid-column: 1;
+    }
+
+    .qty {
+      grid-column: 2;
+    }
+
+    .card-foot {
+      grid-column: 3;
+      grid-row: 2;
+    }
+  }
+}
+
+.card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+
+  &:hover {
+    border-color: var(--line-strong);
+  }
+
+  h3 {
+    margin: 2px 0 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+}
+
+.card-empty,
+.card-empty:hover {
+  border-color: var(--low);
+}
+
+.card-low {
+  border-left: 3px solid var(--ochre);
+}
+
+.card-dup {
+  background: var(--low-bg);
+}
+
+// Colour filter: one chip per colour in the category
+.color-row {
+  margin: 4px 0 8px;
+
+  :global(.chip) {
+    text-transform: capitalize;
+  }
+}
+
+.card-open {
+  position: absolute;
+  inset: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--radius);
+}
+
+.card-group {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.qty {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  b {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1;
+  }
+
+  span {
+    color: var(--muted);
+    font-weight: 400;
+  }
+}
+
+// Colour, size and gender of the variant: the line that tells the variants of a model apart
+.variant {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 14px;
+}
+
+.variant-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.size {
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 1px 7px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.gender {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.card-ref {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.val {
+  font-weight: 700;
+}
+
+.val-np {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.quick {
+  display: flex;
+  gap: 6px;
+
+  button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+    font-size: 18px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+
+    &:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent-text);
+    }
+  }
+}
+
+// Recent changes
+
+.log {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  width: 100%;
+  text-align: left;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: var(--panel);
+  }
+
+  time {
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  @include variables.sm-breakpoint {
+    grid-template-columns: 80px minmax(0, 1fr);
+
+    time {
+      grid-column: 2;
+    }
+  }
+}
+
+.log-qty {
+  font-weight: 700;
+  font-size: 18px;
+  text-align: right;
+
+  small {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+}
+
+.what {
+  min-width: 0;
+
+  b {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+}
+
+.footer {
+  margin: 56px 0 32px;
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}

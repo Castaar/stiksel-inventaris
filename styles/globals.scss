@@ -1,14 +1,390 @@
-@import "variables";
-@import "atoms/atoms";
+// Design tokens in the stiksel.com house style: black and white, Gobold italic capitals for
+// headings and big numbers, raspberry pink as accent with the petrol, sky blue and ochre of the site.
+// Light by default; dark when the user picks it (header menu).
+:root {
+  --bg: #ffffff;
+  --panel: #f6f5f3;
+  --panel-2: #ebe9e5;
+  --ink: #000000;
+  --muted: #66676b;
+  // Raspberry from stiksel.com for accents, links and the active state
+  --accent: #cc3366;
+  --accent-ink: #ffffff;
+  // Accent for small text on white (readable contrast)
+  --accent-text: #b02a57;
+  // Strong buttons are black, as on the site
+  --strong: #000000;
+  --strong-ink: #ffffff;
+  --petrol: #86aaab;
+  --sky: #6ec1e4;
+  --ochre: #da984e;
+  --line: rgba(0, 0, 0, 0.12);
+  --line-strong: rgba(0, 0, 0, 0.32);
+  --low: #c8372d;
+  --low-bg: rgba(200, 55, 45, 0.08);
+  --ok: #2f7d4f;
+  --warn: #9a6512;
+  --warn-bg: rgba(218, 152, 78, 0.16);
+  --radius: 3px;
+  color-scheme: light;
+  accent-color: var(--accent);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0b0b;
+  --panel: #151515;
+  --panel-2: #222222;
+  --ink: #ffffff;
+  --muted: #a0a0a4;
+  --accent: #e0507f;
+  --accent-ink: #ffffff;
+  --accent-text: #f07ba1;
+  --strong: #ffffff;
+  --strong-ink: #000000;
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.36);
+  --low: #f0705f;
+  --low-bg: rgba(240, 112, 95, 0.12);
+  --ok: #7cc493;
+  --warn: #f0b46a;
+  --warn-bg: rgba(218, 152, 78, 0.18);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: 90px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 a {
-    color: white;
+  color: inherit;
 }
 
-a img {
-    pointer-events: none;
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
 }
 
-.cursor-pointer {
-    cursor: pointer;
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+// The wrapper in _app defines --font-gobold (next/font), so the display font is defined there too
+.app {
+  --font-display: var(--font-gobold), "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+}
+
+// Headings as on stiksel.com: Gobold italic in capitals
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+// Values are stored in lower case; show names with a capital
+.cap {
+  text-transform: capitalize;
+}
+
+.ref {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// Shared building blocks
+
+.wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  &.primary {
+    background: var(--strong);
+    border-color: var(--strong);
+    color: var(--strong-ink);
+    font-weight: 600;
+
+    &:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+  }
+
+  &.danger {
+    border-color: var(--low);
+    color: var(--low);
+  }
+
+  &.small {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+.iconbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+}
+
+.linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 14px;
+  color: var(--muted);
+  text-transform: capitalize;
+
+  &:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  &[aria-pressed="true"] {
+    border-color: var(--strong);
+    background: var(--strong);
+    color: var(--strong-ink);
+  }
+
+  small {
+    opacity: 0.7;
+  }
+}
+
+// Colour dot; the background comes from lib/colors.js
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  flex: none;
+  vertical-align: -2px;
+
+  &.unknown {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  &.big {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.input {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  outline: none;
+  width: 100%;
+
+  &:focus {
+    border-color: var(--accent);
+  }
+
+  option {
+    background: var(--panel);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+
+  label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+}
+
+.seg {
+  display: flex;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  width: max-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+
+  button {
+    background: none;
+    border: 0;
+    padding: 8px 18px;
+    color: var(--muted);
+    text-transform: capitalize;
+  }
+
+  button[aria-pressed="true"],
+  button[aria-checked="true"] {
+    background: var(--strong);
+    color: var(--strong-ink);
+  }
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 8px;
+  text-transform: none;
+
+  &.empty {
+    background: var(--low);
+    color: #fff;
+  }
+
+  &.low {
+    background: var(--ochre);
+    color: #000;
+  }
+
+  &.dup {
+    border: 1px solid var(--low);
+    color: var(--low);
+  }
+
+  &.old {
+    background: var(--petrol);
+    color: #000;
+  }
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+
+.empty-state {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: 36px;
+  text-align: center;
+  color: var(--muted);
+
+  p {
+    margin: 0 0 14px;
+  }
+}
+
+.error-message {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border: 1px solid var(--low);
+  color: var(--low);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+// Checkbox with its label on one line (forms)
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
 }

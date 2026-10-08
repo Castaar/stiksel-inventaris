@@ -1,0 +1,58 @@
+.gate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px 28px;
+}
+
+.logo {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 28px;
+
+  svg {
+    height: 28px;
+    width: auto;
+    display: block;
+  }
+
+  small {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    line-height: 1;
+  }
+}
+
+.error {
+  color: var(--low);
+  background: var(--low-bg);
+  border-radius: var(--radius);
+  padding: 8px 11px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 36px;
+}

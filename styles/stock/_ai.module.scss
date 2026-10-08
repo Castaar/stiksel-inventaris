@@ -1,0 +1,91 @@
+// AI answer above the search results
+
+.ask {
+  margin-top: 28px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: none;
+  text-align: left;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-text);
+    flex: none;
+  }
+
+  small {
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  &:hover {
+    border-color: var(--accent);
+    border-style: solid;
+  }
+}
+
+.box {
+  margin-top: 28px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-text);
+  }
+
+  b {
+    color: var(--accent-text);
+  }
+
+  span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+}
+
+.text {
+  font-size: 16px;
+  line-height: 1.5;
+
+  p {
+    margin: 0 0 6px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+}
+
+.loading {
+  margin: 0;
+  color: var(--muted);
+}
+
+.error {
+  margin: 0;
+  color: var(--low);
+}
