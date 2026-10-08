@@ -4,6 +4,7 @@ const isPreview = process.env.VERCEL_ENV === "preview";
 const vercelLive = isPreview ? " https://vercel.live" : "";
 
 // Pages only load their own scripts; __NEXT_DATA__ is JSON and isn't executed.
+// The build uses webpack (package.json): a Turbopack build adds an inline bootstrap script that this policy blocks.
 // Inline styles are needed for style props and react-hot-toast.
 const contentSecurityPolicy = [
   "default-src 'self'",
