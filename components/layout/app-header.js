@@ -19,7 +19,7 @@ function toggleTheme() {
 
 // Overzicht, one tab per database, Recent. Search and "+ Product" only show on the dashboard
 // (when their handlers are passed).
-export default function AppHeader({ tab, databases = [], search, onSearch, onSearchSubmit, onAdd, layout, onLayout, menu = [] }) {
+export default function AppHeader({ tab, databases = [], search, onSearch, onSearchSubmit, onAdd, layout, onLayout, castaarUrl, menu = [] }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dbOpen, setDbOpen] = useState(false);
@@ -133,6 +133,14 @@ export default function AppHeader({ tab, databases = [], search, onSearch, onSea
           </nav>
         )}
         <div className={styles["spacer"]} />
+        {castaarUrl && (
+          <a href={castaarUrl} className={styles["switch"]} title="Naar de inventaris van Castaar">
+            Castaar
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
+          </a>
+        )}
         {onSearch && (
           <div className={styles["search"]}>
             <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" aria-hidden="true">

@@ -1,18 +1,29 @@
 import { getClient } from "../../lib/mongodb";
-import { existingDatabase } from "../../lib/inventory";
-import { allowMethods, assertCollectionName, normalizeNewCollectionName, sendError, HttpError } from "../../lib/api";
+import { existingDatabase, listDatabaseNames } from "../../lib/inventory";
+import { allowMethods, assertCollectionName, assertDatabaseName, normalizeNewCollectionName, sendError, HttpError } from "../../lib/api";
 
 async function exists(db, name) {
   const found = await db.listCollections({ name }, { nameOnly: true }).toArray();
   return found.length > 0;
 }
 
-// Category management: { db, action: "create" | "rename" | "delete", name, newName }
+// Category management: { db, action: "create" | "rename" | "delete", name, newName }.
+// "create-database" makes a new inventory with its first category (MongoDB only keeps a database with a collection).
 export default async function handler(req, res) {
   if (!allowMethods(req, res, ["POST"])) return;
 
   try {
     const { action } = req.body || {};
+
+    if (action === "create-database") {
+      const dbName = assertDatabaseName(normalizeNewCollectionName(req.body.db));
+      if ((await listDatabaseNames()).includes(dbName)) throw new HttpError(409, `Inventaris "${dbName}" bestaat al`);
+      const name = normalizeNewCollectionName(req.body.name);
+      const client = await getClient();
+      await client.db(dbName).createCollection(name);
+      return res.status(201).json({ db: dbName, name });
+    }
+
     const dbName = await existingDatabase(req.body?.db);
     const client = await getClient();
     const db = client.db(dbName);

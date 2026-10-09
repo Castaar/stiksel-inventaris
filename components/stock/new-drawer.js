@@ -21,12 +21,13 @@ const sizesOf = (maat) => {
 };
 
 // New product: pick the database and category, then the fields. Several sizes at once with "S, M, L".
-export default function NewDrawer({ data, initialDb, initialCollection, onClose, onCreated }) {
+// `initialValues` prefills the form, e.g. a new colour or size of an existing model
+export default function NewDrawer({ data, initialDb, initialCollection, initialValues, onClose, onCreated }) {
   const categoryId = useId();
   const databases = Object.keys(data);
   const [db, setDb] = useState(databases.includes(initialDb) ? initialDb : databases[0] || "");
   const [collection, setCollection] = useState(initialCollection || "");
-  const [values, setValues] = useState({ ...EMPTY, leverdatum: today() });
+  const [values, setValues] = useState(() => ({ ...EMPTY, leverdatum: today(), ...initialValues }));
   const [isSaving, setIsSaving] = useState(false);
 
   const products = useMemo(() => data[db]?.products || [], [data, db]);

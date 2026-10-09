@@ -2,14 +2,16 @@ import { useId, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { label } from "../../lib/stock-view";
-import { manageCollection } from "../../lib/stock-actions";
+import { manageCollection, saveLowStock } from "../../lib/stock-actions";
 import { DrawerBody, DrawerHead } from "./drawer";
 
 import styles from "../../styles/stock/_drawer.module.scss";
 
-export default function CategoriesDrawer({ db, collections, onClose, onChanged }) {
+export default function CategoriesDrawer({ db, collections, lowStockBelow, onClose, onChanged }) {
   const inputId = useId();
+  const lowId = useId();
   const [newName, setNewName] = useState("");
+  const [low, setLow] = useState(lowStockBelow ? String(lowStockBelow) : "");
   const [busy, setBusy] = useState(false);
 
   const run = async (body, successMessage) => {
@@ -31,6 +33,20 @@ export default function CategoriesDrawer({ db, collections, onClose, onChanged }
     e.preventDefault();
     if (!newName.trim()) return;
     if (await run({ action: "create", name: newName }, (r) => `Categorie "${r.name}" aangemaakt`)) setNewName("");
+  };
+
+  const saveLow = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const result = await saveLowStock(db, low);
+      toast.success(result.low_stock_below ? `"Bijna op" onder ${result.low_stock_below} stuks` : `Geen "bijna op" voor ${label(db)}`);
+      await onChanged();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const rename = (name) => {
@@ -65,6 +81,23 @@ export default function CategoriesDrawer({ db, collections, onClose, onChanged }
           </div>
         </form>
         <p className="hint">Namen worden kleine letters met _ (bv. hoodies_kids). Alleen lege categorieën kunnen weg.</p>
+        <form className="field" onSubmit={saveLow}>
+          <label htmlFor={lowId}>&ldquo;Bijna op&rdquo; melden onder (stuks)</label>
+          <div className={styles["mut"]} style={{ marginTop: 0 }}>
+            <input
+              id={lowId}
+              className="input"
+              inputMode="numeric"
+              value={low}
+              onChange={(e) => setLow(e.target.value)}
+              placeholder="Leeg = nooit"
+            />
+            <button type="submit" className="btn" disabled={busy}>
+              Bewaren
+            </button>
+          </div>
+        </form>
+        <p className="hint">Bv. 3 voor de DTF-printer: inktbussen en transferpapier met minder dan 3 stuks worden gemeld.</p>
         <h3>{collections.length} categorieën</h3>
         {collections.map((name) => (
           <div key={name} className={styles["cat-row"]}>

@@ -18,7 +18,8 @@ import {
   updatedAt,
   variantLine,
 } from "../../lib/stock-view";
-import { ProductGrid } from "./product-card";
+import { ModelGrid } from "./model-card";
+import { groupModels, sizesIn, sortModels } from "../../lib/models";
 import ColorDot from "./color-dot";
 
 import styles from "../../styles/stock/_dashboard.module.scss";
@@ -91,8 +92,9 @@ export function Overview({ data, now, cardProps, onOpen, onShowNoPrice }) {
   const empty = all.filter((p) => status(p) === "empty").length;
   const low = all.filter((p) => status(p) === "low").length;
   const duplicates = all.filter((p) => p.duplicate).length;
-  // Empty first, then almost empty, then duplicates
-  const attention = sortProducts(all.filter((p) => status(p) !== "ok" || p.duplicate), "laag");
+  const lowEnabled = databases.some((db) => data[db].low_stock_below > 0);
+  // Per model, with only the variants that are empty, almost empty or entered twice
+  const attention = sortModels(groupModels(all.filter((p) => status(p) !== "ok" || p.duplicate)), "laag");
   const changedThisWeek = all.filter((p) => now - updatedAt(p) < 7 * DAY).length;
   const pieces = sum(all, quantity);
   const collectionCount = sum(databases, (db) => data[db].collections.length);
@@ -141,10 +143,12 @@ export function Overview({ data, now, cardProps, onOpen, onShowNoPrice }) {
           <div className={styles["n"]}>{empty}</div>
           <div className={styles["l"]}>Op (0 stuks)</div>
         </a>
-        <a href="#aandacht" className={`${styles["kpi"]} ${low ? styles["kpi-warn"] : ""}`}>
-          <div className={styles["n"]}>{low}</div>
-          <div className={styles["l"]}>Bijna op (minder dan 5)</div>
-        </a>
+        {lowEnabled && (
+          <a href="#aandacht" className={`${styles["kpi"]} ${low ? styles["kpi-warn"] : ""}`}>
+            <div className={styles["n"]}>{low}</div>
+            <div className={styles["l"]}>Bijna op</div>
+          </a>
+        )}
         <div className={styles["kpi"]}>
           <div className={styles["n"]}>{nf.format(pieces)}</div>
           <div className={styles["l"]}>Stuks in {all.length} producten, {collectionCount} categorieën</div>
@@ -166,9 +170,9 @@ export function Overview({ data, now, cardProps, onOpen, onShowNoPrice }) {
       </div>
 
       <section className={styles["block"]} id="aandacht">
-        <BlockHead title="Aandacht nodig" meta="Op, bijna op of dubbel ingevoerd" />
+        <BlockHead title="Aandacht nodig" meta={lowEnabled ? "Op, bijna op of dubbel ingevoerd" : "Op of dubbel ingevoerd"} />
         {attention.length ? (
-          <ProductGrid products={attention} {...cardProps} />
+          <ModelGrid models={attention} {...cardProps} />
         ) : (
           <div className="empty-state"><p>Alles is goed op voorraad.</p></div>
         )}
@@ -203,17 +207,37 @@ function ColorFilter({ products, color, onColor }) {
   );
 }
 
-// One database: filter per category and colour, grouped per category when showing all
-export function KindView({ db, part, category, onCategory, color, onColor, sort, onSort, cardProps, onAdd, onManage, onExport }) {
+// The sizes of the products shown, as a row of chips to filter on
+function SizeFilter({ products, size, onSize }) {
+  const sizes = sizesIn(products);
+  if (sizes.length < 2 && !size) return null;
+  return (
+    <div className={`chips ${styles["size-row"]}`} role="group" aria-label="Filter op maat">
+      <button type="button" className="chip" aria-pressed={!size} onClick={() => onSize(null)}>
+        Alle maten
+      </button>
+      {sizes.map(([maat, count]) => (
+        <button key={maat} type="button" className="chip" aria-pressed={size === maat} onClick={() => onSize(size === maat ? null : maat)}>
+          {maat} <small>{count}</small>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// One database: filter per category, colour and size; one card per model, grouped per category when showing all
+export function KindView({ db, part, category, onCategory, color, onColor, size, onSize, sort, onSort, cardProps, onAdd, onManage, onExport }) {
   const inCategory = category ? part.products.filter((p) => p.collection === category) : part.products;
-  const shown = color ? inCategory.filter((p) => (p.kleur || "").trim() === color) : inCategory;
+  const ofColor = color ? inCategory.filter((p) => (p.kleur || "").trim() === color) : inCategory;
+  const shown = size ? ofColor.filter((p) => (p.maat || "").trim() === size) : ofColor;
   const groups = category ? [category] : part.collections;
+  const filtered = Boolean(color || size);
 
   return (
     <section className={styles["block"]}>
       <BlockHead
         title={label(db)}
-        meta={`${shown.length} producten, ${nf.format(sum(shown, quantity))} stuks, ${eur.format(sum(shown, (p) => p.value))}`}
+        meta={`${groupModels(shown).length} modellen, ${nf.format(sum(shown, quantity))} stuks, ${eur.format(sum(shown, (p) => p.value))}`}
       >
         <SortSelect sort={sort} onSort={onSort} />
         <button type="button" className="btn small" onClick={onExport}>CSV</button>
@@ -232,22 +256,25 @@ export function KindView({ db, part, category, onCategory, color, onColor, sort,
         </div>
       )}
       <ColorFilter products={inCategory} color={color} onColor={onColor} />
+      {/* Sizes of the chosen colour, so only sizes that exist in that colour show */}
+      <SizeFilter products={ofColor} size={size} onSize={onSize} />
       {groups.map((name) => {
-        const products = sortProducts(shown.filter((p) => p.collection === name), sort);
-        if (color && !products.length) return null;
+        const products = shown.filter((p) => p.collection === name);
+        const models = sortModels(groupModels(products), sort);
+        if (filtered && !products.length) return null;
         return (
           <div key={name}>
             <div className={styles["subhead"]}>
               <span className="cap">{label(name)}</span>{" "}
               <span>
-                {products.length} producten, {nf.format(sum(products, quantity))} stuks, {eur.format(sum(products, (p) => p.value))}
+                {models.length} modellen, {nf.format(sum(products, quantity))} stuks, {eur.format(sum(products, (p) => p.value))}
               </span>
               <button type="button" className={`linkbtn ${styles["subhead-add"]}`} onClick={() => onAdd(db, name)}>
                 + Product
               </button>
             </div>
             {products.length ? (
-              <ProductGrid products={products} {...cardProps} />
+              <ModelGrid models={models} {...cardProps} />
             ) : (
               <div className="empty-state">
                 <p>Nog geen producten in {label(name)}.</p>
@@ -274,7 +301,7 @@ export function ProductListSection({ title, meta, products, sort, onSort, cardPr
         {onSort && <SortSelect sort={sort} onSort={onSort} />}
         {actions}
       </BlockHead>
-      {products.length ? <ProductGrid products={sortProducts(products, sort)} {...cardProps} /> : empty}
+      {products.length ? <ModelGrid models={sortModels(groupModels(products), sort)} {...cardProps} /> : empty}
     </section>
   );
 }

@@ -19,10 +19,12 @@ test('variant key ignores case and spaces', () => {
   assert.notEqual(variantKey({ refnr: 'jh001', kleur: 'navy', maat: 'm' }), variantKey({ refnr: 'jh001', kleur: 'navy', maat: 'l' }));
 });
 
-test('status: op, bijna op, ok', () => {
+test('status: op, bijna op (per inventory), ok', () => {
   assert.equal(status({ stock: 0 }), 'empty');
-  assert.equal(status({ stock: 4 }), 'low');
-  assert.equal(status({ stock: 5 }), 'ok');
+  assert.equal(status({ stock: 4, low_below: 5 }), 'low');
+  assert.equal(status({ stock: 5, low_below: 5 }), 'ok');
+  // Without a limit for the inventory there is no "bijna op"
+  assert.equal(status({ stock: 1 }), 'ok');
 });
 
 test('search: every word, colour families find their shades', () => {

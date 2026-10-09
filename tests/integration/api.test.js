@@ -207,6 +207,31 @@ describe('export and import', () => {
   });
 });
 
+describe('settings and new inventories', () => {
+  test('"bijna op" is off until it is set for an inventory', async () => {
+    await hoodies().insertOne(product({ stock: 2 }));
+    const { loadInventories } = await import('../../lib/inventory.js');
+    expect((await loadInventories()).winkel.products[0].low_below).toBe(0);
+
+    const saved = await api('settings', { body: { db: 'winkel', low_stock_below: '3' } });
+    expect(saved.data.low_stock_below).toBe(3);
+    const data = await loadInventories();
+    expect(data.winkel.low_stock_below).toBe(3);
+    expect(data.winkel.products[0].low_below).toBe(3);
+
+    expect((await api('settings', { body: { db: 'winkel', low_stock_below: '' } })).data.low_stock_below).toBe(0);
+    expect((await api('settings', { body: { db: 'bestaatniet', low_stock_below: 3 } })).status).toBe(404);
+  });
+
+  test('a new inventory with its first category', async () => {
+    const created = await api('collections', { body: { action: 'create-database', db: 'DTF printer', name: 'Inktbussen' } });
+    expect(created).toMatchObject({ status: 201, data: { db: 'dtf_printer', name: 'inktbussen' } });
+    expect((await api('collections', { body: { action: 'create-database', db: 'dtf printer', name: 'x' } })).status).toBe(409);
+    expect((await api('collections', { body: { action: 'create-database', db: 'stiksel_inventaris', name: 'x' } })).status).toBe(400);
+    await client.db('dtf_printer').dropDatabase();
+  });
+});
+
 describe('health', () => {
   test('reports the database as up', async () => {
     const { status, data } = await api('health', { method: 'GET' });

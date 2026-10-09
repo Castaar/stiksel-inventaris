@@ -6,14 +6,17 @@ import { toast } from "react-hot-toast";
 
 import { loadInventories, toProps } from "../lib/inventory";
 import { label, matches, nf, productKey, productTitle, sortProducts } from "../lib/stock-view";
+import { groupModels, modelKey } from "../lib/models";
 import { changeQuantity, downloadExport } from "../lib/stock-actions";
 
 import AppHeader from "../components/layout/app-header";
 import Drawer from "../components/stock/drawer";
 import ProductDrawer from "../components/stock/product-drawer";
+import ModelDrawer from "../components/stock/model-drawer";
 import EditDrawer from "../components/stock/edit-drawer";
 import NewDrawer from "../components/stock/new-drawer";
 import CategoriesDrawer from "../components/stock/categories-drawer";
+import NewInventoryDrawer from "../components/stock/new-inventory-drawer";
 import ImportDrawer from "../components/stock/import-drawer";
 import AiAnswer from "../components/stock/ai-answer";
 import { suggestionsFor } from "../components/stock/product-fields";
@@ -25,7 +28,7 @@ import styles from "../styles/stock/_dashboard.module.scss";
 const LAYOUT_COOKIE = "stiksel_stock_layout";
 const LAYOUTS = ["tegels", "rijen"];
 
-export default function Dashboard({ data, now, error, initialLayout, aiEnabled, importNeedsPassword }) {
+export default function Dashboard({ data, now, error, initialLayout, aiEnabled, importNeedsPassword, castaarUrl }) {
   const router = useRouter();
   const query = router.query;
   const databases = Object.keys(data);
@@ -33,6 +36,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
   const kindDb = databases.includes(tab) ? tab : null;
   const category = typeof query.cat === "string" ? query.cat : null;
   const color = typeof query.kleur === "string" ? query.kleur : null;
+  const size = typeof query.maat === "string" ? query.maat : null;
 
   const [search, setSearch] = useState("");
   // Picking a tab ends the search
@@ -50,7 +54,8 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
     document.cookie = `${LAYOUT_COOKIE}=${next}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
   };
   const [busy, setBusy] = useState(false);
-  // { type: "product" | "edit", key } | { type: "new", db, collection } | { type: "categories", db } | { type: "import", db }
+  // { type: "model", key } | { type: "product" | "edit", key, from? } | { type: "new", db, collection, values? }
+  // | { type: "categories", db } | { type: "import", db } | { type: "inventory" }
   const [drawer, setDrawer] = useState(() => {
     if (query.add) return { type: "new", db: kindDb, collection: category };
     if (query.open && kindDb && category) return { type: "product", key: `${kindDb}:${category}:${query.open}` };
@@ -59,6 +64,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
   const all = useMemo(() => databases.flatMap((db) => data[db].products), [data, databases]);
   const byKey = useMemo(() => new Map(all.map((p) => [productKey(p), p])), [all]);
+  const models = useMemo(() => new Map(groupModels(all).map((m) => [m.key, m])), [all]);
 
   const setQuery = (next) =>
     router.replace({ pathname: "/", query: Object.fromEntries(Object.entries(next).filter(([, v]) => v)) }, undefined, {
@@ -71,6 +77,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
   const close = useCallback(() => setDrawer(null), []);
   const open = useCallback((key) => setDrawer({ type: "product", key }), []);
+  const openModel = useCallback((key) => setDrawer({ type: "model", key }), []);
 
   const onQuantity = async (product, delta) => {
     setBusy(true);
@@ -118,7 +125,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
   const addFor = (db, collection) => setDrawer({ type: "new", db, collection });
 
-  const cardProps = { onOpen: open, onQuick: onQuantity, busy, layout };
+  const cardProps = { onOpen: open, onOpenModel: openModel, onQuick: onQuantity, busy, layout };
   const q = search.trim();
 
   let content;
@@ -156,6 +163,8 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onCategory={(cat) => setQuery({ tab: kindDb, cat })}
         color={color}
         onColor={(kleur) => setQuery({ tab: kindDb, cat: category, kleur })}
+        size={size}
+        onSize={(maat) => setQuery({ tab: kindDb, cat: category, kleur: color, maat })}
         sort={sort}
         onSort={setSort}
         cardProps={cardProps}
@@ -185,8 +194,27 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
   // The drawer's product comes from the latest data, so it updates after every change
   const drawerProduct = drawer?.key ? byKey.get(drawer.key) : null;
+  const drawerModel = drawer?.type === "model" ? models.get(drawer.key) : null;
   let drawerContent = null;
-  if (drawer?.type === "product" && drawerProduct) {
+  if (drawerModel) {
+    const first = drawerModel.variants[0];
+    drawerContent = (
+      <ModelDrawer
+        key={drawer.key}
+        model={drawerModel}
+        onClose={close}
+        onOpen={(key) => setDrawer({ type: "product", key, from: drawer.key })}
+        onAddVariant={() =>
+          setDrawer({
+            type: "new",
+            db: first.db,
+            collection: first.collection,
+            values: { refnr: first.refnr || "", modelnaam: first.modelnaam || "", merk: first.merk || "", gender: first.gender || "", akp: first.akp ?? "" },
+          })
+        }
+      />
+    );
+  } else if (drawer?.type === "product" && drawerProduct) {
     const variants = drawerProduct.refnr
       ? data[drawerProduct.db].products.filter((p) => p.refnr === drawerProduct.refnr)
       : [drawerProduct];
@@ -201,7 +229,8 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onClose={close}
         onChange={onQuantity}
         onOpen={open}
-        onEdit={() => setDrawer({ type: "edit", key: drawer.key })}
+        onBack={drawer.from ? () => openModel(drawer.from) : models.get(modelKey(drawerProduct))?.variants.length > 1 ? () => openModel(modelKey(drawerProduct)) : undefined}
+        onEdit={() => setDrawer({ type: "edit", key: drawer.key, from: drawer.from })}
       />
     );
   } else if (drawer?.type === "edit" && drawerProduct) {
@@ -210,10 +239,10 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         key={`${drawer.key}:${drawerProduct.updated_at}`}
         product={drawerProduct}
         suggestions={suggestionsFor(data[drawerProduct.db].products)}
-        onClose={() => setDrawer({ type: "product", key: drawer.key })}
+        onClose={() => setDrawer({ type: "product", key: drawer.key, from: drawer.from })}
         onSaved={async () => {
           await refresh();
-          setDrawer({ type: "product", key: drawer.key });
+          setDrawer({ type: "product", key: drawer.key, from: drawer.from });
         }}
         onDeleted={async () => {
           setDrawer(null);
@@ -228,6 +257,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         data={data}
         initialDb={db}
         initialCollection={data[db].collections.includes(drawer.collection) ? drawer.collection : ""}
+        initialValues={drawer.values}
         onClose={close}
         onCreated={async (createdDb, collection, id) => {
           await refresh();
@@ -237,7 +267,23 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
     );
   } else if (drawer?.type === "categories") {
     drawerContent = (
-      <CategoriesDrawer db={drawer.db} collections={data[drawer.db]?.collections || []} onClose={close} onChanged={refresh} />
+      <CategoriesDrawer
+        db={drawer.db}
+        collections={data[drawer.db]?.collections || []}
+        lowStockBelow={data[drawer.db]?.low_stock_below || 0}
+        onClose={close}
+        onChanged={refresh}
+      />
+    );
+  } else if (drawer?.type === "inventory") {
+    drawerContent = (
+      <NewInventoryDrawer
+        onClose={close}
+        onCreated={async (db) => {
+          setDrawer(null);
+          await router.push({ pathname: "/", query: { tab: db } });
+        }}
+      />
     );
   } else if (drawer?.type === "import" && databases.length) {
     drawerContent = (
@@ -270,11 +316,13 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onSearchSubmit={aiEnabled ? askAi : undefined}
         layout={layout}
         onLayout={changeLayout}
+        castaarUrl={castaarUrl}
         onAdd={() => addFor(kindDb, kindDb ? category : null)}
         menu={[
           { label: "Exporteren naar CSV (alles)", onClick: () => exportCsv() },
           { label: "Importeren uit CSV", onClick: () => setDrawer({ type: "import", db: kindDb }) },
           ...databases.map((db) => ({ label: `Categorieën ${label(db)}`, onClick: () => setDrawer({ type: "categories", db }) })),
+          { label: "Nieuwe inventaris", onClick: () => setDrawer({ type: "inventory" }) },
           { label: "Historiek", href: "/historiek" },
         ]}
       />
@@ -308,7 +356,12 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
 export async function getServerSideProps({ req }) {
   const initialLayout = LAYOUTS.includes(req.cookies[LAYOUT_COOKIE]) ? req.cookies[LAYOUT_COOKIE] : "tegels";
-  const flags = { aiEnabled: Boolean(process.env.GEMINI_API_KEY), importNeedsPassword: Boolean(process.env.IMPORT_PASSWORD) };
+  const flags = {
+    aiEnabled: Boolean(process.env.GEMINI_API_KEY),
+    importNeedsPassword: Boolean(process.env.IMPORT_PASSWORD),
+    // The Castaar inventory, one click away in the header
+    castaarUrl: process.env.CASTAAR_URL || null,
+  };
   try {
     const data = await loadInventories();
     return { props: { data: toProps(data), now: Date.now(), error: false, initialLayout, ...flags } };

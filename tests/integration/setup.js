@@ -10,7 +10,7 @@ let baseUrl;
 
 const ROUTES = [
   'products/add', 'products/adjust', 'products/update', 'products/delete',
-  'export', 'import', 'collections', 'health', 'login', 'history', 'ask',
+  'export', 'import', 'collections', 'settings', 'health', 'login', 'history', 'ask',
 ];
 
 // Minimal version of the Next.js API route runtime (query, body parser, res helpers)

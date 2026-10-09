@@ -24,6 +24,7 @@ export default function VariantMatrix({ variants, currentKey, onOpen }) {
             {sizes.map((size) => (
               <th key={size} scope="col">{size ? size.toUpperCase() : "-"}</th>
             ))}
+            {sizes.length > 1 && <th scope="col">Totaal</th>}
           </tr>
         </thead>
         <tbody>
@@ -52,6 +53,11 @@ export default function VariantMatrix({ variants, currentKey, onOpen }) {
                     </td>
                   );
                 })}
+                {sizes.length > 1 && (
+                  <td className={styles["matrix-total"]}>
+                    {nf.format(variants.filter((p) => rowName(p) === row).reduce((n, p) => n + quantity(p), 0))}
+                  </td>
+                )}
               </tr>
             );
           })}
@@ -63,6 +69,7 @@ export default function VariantMatrix({ variants, currentKey, onOpen }) {
               {totals.map((total, i) => (
                 <td key={sizes[i]}>{nf.format(total)}</td>
               ))}
+              {sizes.length > 1 && <td className={styles["matrix-total"]}>{nf.format(totals.reduce((a, b) => a + b, 0))}</td>}
             </tr>
           </tfoot>
         )}

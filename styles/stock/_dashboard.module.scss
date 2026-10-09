@@ -537,3 +537,28 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+
+// Colour dots of a model card
+.dots {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  small {
+    color: var(--muted);
+    font-size: 12px;
+    margin-left: 2px;
+  }
+}
+
+// Size filter: one chip per size, in size order
+.size-row {
+  margin: 0 0 8px;
+
+  :global(.chip):not(:first-child) {
+    text-transform: uppercase;
+    min-width: 42px;
+    justify-content: center;
+  }
+}

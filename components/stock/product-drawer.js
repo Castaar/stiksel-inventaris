@@ -33,7 +33,7 @@ function useProductHistory(product) {
 }
 
 // `variants` are all products with the same refnr in this database (this one included)
-export default function ProductDrawer({ product, productKey, variants, now, onClose, onEdit, onChange, onOpen, busy }) {
+export default function ProductDrawer({ product, productKey, variants, now, onClose, onEdit, onChange, onOpen, onBack, busy }) {
   const [amount, setAmount] = useState("");
   const history = useProductHistory(product);
 
@@ -58,6 +58,13 @@ export default function ProductDrawer({ product, productKey, variants, now, onCl
         onClose={onClose}
       />
       <DrawerBody>
+        {onBack && (
+          <p className={styles["back"]}>
+            <button type="button" className="linkbtn" onClick={onBack}>
+              ← Alle kleuren en maten
+            </button>
+          </p>
+        )}
         <div className={styles["variant-head"]}>
           <ColorDot kleur={product.kleur} big />
           <span className="cap">{variantLine(product) || "Geen kleur of maat"}</span>
@@ -107,7 +114,7 @@ export default function ProductDrawer({ product, productKey, variants, now, onCl
           </div>
         </div>
 
-        {variants.length > 1 && (
+        {variants.length > 1 && !onBack && (
           <>
             <h3>
               Alle kleuren en maten van {product.refnr ? <span className="ref">{product.refnr}</span> : "dit model"}{" "}
