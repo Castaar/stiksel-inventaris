@@ -43,7 +43,7 @@ export function ModelCard({ model, onOpenModel }) {
           {model.merk && <span className="cap"> · {model.merk}</span>} <ModelTags model={model} />
         </div>
         <h3 className="cap">{model.title}</h3>
-        {model.refnr && <div className={`${styles["card-ref"]} ref`}>{model.refnr}</div>}
+        {model.refnr && model.title !== model.refnr && <div className={`${styles["card-ref"]} ref`}>{model.refnr}</div>}
       </div>
       <div className={styles["variant"]}>
         {model.colors.length > 0 && (

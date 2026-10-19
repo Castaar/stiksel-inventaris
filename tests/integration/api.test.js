@@ -41,13 +41,22 @@ describe('products/add', () => {
   });
 
   test('rejects bad input and unknown databases', async () => {
-    expect((await api('products/add', { body: { db: 'winkel', collection: 'hoodies', ...product({ refnr: '' }) } })).status).toBe(400);
+    expect((await api('products/add', { body: { db: 'winkel', collection: 'hoodies', ...product({ refnr: '', modelnaam: '' }) } })).status).toBe(400);
     expect((await api('products/add', { body: { db: 'winkel', collection: 'hoodies', ...product({ stock: 'veel' }) } })).status).toBe(400);
     expect((await api('products/add', { body: { db: 'winkel', collection: 'hoodies', ...product({ akp: -1 }) } })).status).toBe(400);
     expect((await api('products/add', { body: { db: 'bestaatniet', collection: 'hoodies', ...product() } })).status).toBe(404);
     expect((await api('products/add', { body: { db: 'admin', collection: 'hoodies', ...product() } })).status).toBe(400);
     expect((await api('products/add', { body: { db: 'winkel', collection: '$where', ...product() } })).status).toBe(400);
     expect((await api('products/add', { method: 'GET' })).status).toBe(405);
+  });
+});
+
+describe('products without a refnr', () => {
+  test('are known by their name', async () => {
+    const ink = (kleur) => ({ db: 'winkel', collection: 'hoodies', refnr: '', modelnaam: 'STS XPD-2 Inks', kleur, stock: 2, akp: 70 });
+    expect((await api('products/add', { body: ink('white') })).status).toBe(201);
+    expect((await api('products/add', { body: ink('black') })).status).toBe(201);
+    expect((await api('products/add', { body: ink('White') })).status).toBe(409);
   });
 });
 

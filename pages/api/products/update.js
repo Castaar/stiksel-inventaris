@@ -17,8 +17,9 @@ export default async function handler(req, res) {
     const current = await collection.findOne({ _id });
     if (!current) throw new HttpError(404, "Product niet gevonden");
     const next = { ...current, ...$set };
+    if (!next.refnr && !next.modelnaam) throw new HttpError(400, "Vul een refnr of een modelnaam in");
     if (variantKey(next) !== variantKey(current)) {
-      const others = await collection.find({ _id: { $ne: _id }, refnr: next.refnr }).toArray();
+      const others = await collection.find({ _id: { $ne: _id }, ...(next.refnr ? { refnr: next.refnr } : { modelnaam: next.modelnaam }) }).toArray();
       if (others.some((doc) => variantKey(doc) === variantKey(next))) {
         throw new HttpError(409, "Er bestaat al een product met dezelfde refnr, kleur, maat en gender");
       }

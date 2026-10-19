@@ -12,9 +12,11 @@ export default async function handler(req, res) {
     const { dbName, collectionName, collection } = await productTarget(req.body);
     const product = { ...cleanProductInput(req.body), updated_at: new Date() };
 
-    // The same refnr, colour, size and gender already exists: add to that one instead
+    // The same refnr (or name), colour, size and gender already exists: add to that one instead
     const existing = await collection
-      .find({ refnr: product.refnr }, { projection: Object.fromEntries(TEXT_FIELDS.map((key) => [key, 1])) })
+      .find(product.refnr ? { refnr: product.refnr } : { modelnaam: product.modelnaam }, {
+        projection: Object.fromEntries(TEXT_FIELDS.map((key) => [key, 1])),
+      })
       .toArray();
     const duplicate = existing.find((doc) => variantKey(doc) === variantKey(product));
     if (duplicate) {

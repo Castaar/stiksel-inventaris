@@ -69,8 +69,9 @@ function readRows(records, { dbName, fallbackCollection, existingCollections }) 
 
       // Only the columns that are in the file, so a file without "akp" keeps the prices
       const input = Object.fromEntries(IMPORT_FIELDS.filter((key) => key in record).map((key) => [key, record[key]]));
-      if (!("refnr" in input)) throw new HttpError(400, "kolom refnr ontbreekt");
+      if (!("refnr" in input) && !("modelnaam" in input)) throw new HttpError(400, "kolom refnr of modelnaam ontbreekt");
       const fields = cleanProductInput(input, { partial: true });
+      if (!fields.refnr && !fields.modelnaam) throw new HttpError(400, "geen refnr en geen modelnaam");
 
       if (!groups.has(name)) groups.set(name, []);
       groups.get(name).push({ line, id: String(record.id || "").trim(), versie: String(record.versie || "").trim(), fields });

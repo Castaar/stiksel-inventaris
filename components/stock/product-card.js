@@ -32,13 +32,16 @@ export default function ProductCard({ product, onOpen, onQuick, busy }) {
           {product.merk && <span className="cap"> · {product.merk}</span>} <StatusTags product={product} />
         </div>
         <h3 className="cap">{productTitle(product)}</h3>
-        {product.refnr && <div className={`${styles["card-ref"]} ref`}>{product.refnr}</div>}
+        {/* The title already is the refnr when there is no model name (thread numbers) */}
+        {product.refnr && product.modelnaam && <div className={`${styles["card-ref"]} ref`}>{product.refnr}</div>}
       </div>
       <div className={styles["variant"]}>
-        <span className={styles["variant-color"]}>
-          <ColorDot kleur={product.kleur} />
-          <span className="cap">{product.kleur || "geen kleur"}</span>
-        </span>
+        {product.kleur && (
+          <span className={styles["variant-color"]}>
+            <ColorDot kleur={product.kleur} />
+            <span className="cap">{product.kleur}</span>
+          </span>
+        )}
         {product.maat && <span className={styles["size"]}>{product.maat.toUpperCase()}</span>}
         {product.gender && <span className={`${styles["gender"]} cap`}>{product.gender}</span>}
       </div>
