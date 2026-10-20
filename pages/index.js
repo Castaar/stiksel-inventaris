@@ -130,7 +130,10 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
 
   let content;
   if (q) {
-    const hits = all.filter((p) => matches(p, q));
+    // 0 pieces aren't shown: not in the results means not in stock
+    const found = all.filter((p) => matches(p, q));
+    const hits = found.filter((p) => Number(p.stock) > 0);
+    const hiddenEmpty = found.length - hits.length;
     const aiForQuery = aiEnabled && ai?.question === q ? ai : null;
     content = (
       <>
@@ -139,7 +142,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         {(hits.length > 0 || !aiForQuery) && (
           <ProductListSection
             title="Zoekresultaten"
-            meta={`${hits.length} voor “${q}”`}
+            meta={`${hits.length} voor “${q}”${hiddenEmpty ? `, ${hiddenEmpty} met 0 stuks niet getoond` : ""}`}
             products={hits}
             sort={sort}
             onSort={setSort}
@@ -176,7 +179,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
   } else if (tab === "recent") {
     content = <RecentView products={all} now={now} onOpen={open} />;
   } else if (tab === "zonder-akp") {
-    const list = all.filter((p) => !p.has_price);
+    const list = all.filter((p) => !p.has_price && Number(p.stock) > 0);
     content = (
       <ProductListSection
         title="Zonder AKP"

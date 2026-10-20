@@ -562,3 +562,14 @@
     justify-content: center;
   }
 }
+
+// Which inventory a card belongs to, where several are mixed (search, overview)
+.db-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--ink);
+  font-size: 12px;
+}

@@ -25,7 +25,7 @@ export function sizeRange(sizes) {
 }
 
 // One card for a model with all its colours and sizes; the drawer shows the colour x size table
-export function ModelCard({ model, onOpenModel }) {
+export function ModelCard({ model, onOpenModel, showDb }) {
   const state = model.stock <= 0 ? "empty" : model.empty || model.low ? "low" : "ok";
   const extraColors = model.colors.length - MAX_DOTS;
 
@@ -39,6 +39,7 @@ export function ModelCard({ model, onOpenModel }) {
       />
       <div>
         <div className={styles["card-group"]}>
+          {showDb && <span className={`${styles["db-tag"]} cap`}>{label(model.db)}</span>}
           <span className="cap">{label(model.collection)}</span>
           {model.merk && <span className="cap"> · {model.merk}</span>} <ModelTags model={model} />
         </div>
@@ -78,14 +79,14 @@ export function ModelCard({ model, onOpenModel }) {
 }
 
 // Models with one variant (thread, a cap in one size) stay a normal product card with + and −
-export function ModelGrid({ models, layout, onOpenModel, ...cardProps }) {
+export function ModelGrid({ models, layout, onOpenModel, showDb, ...cardProps }) {
   return (
     <div className={layout === "rijen" ? styles["rows"] : styles["grid"]}>
       {models.map((model) =>
         model.variants.length === 1 ? (
-          <ProductCard key={productKey(model.variants[0])} product={model.variants[0]} {...cardProps} />
+          <ProductCard key={productKey(model.variants[0])} product={model.variants[0]} showDb={showDb} {...cardProps} />
         ) : (
-          <ModelCard key={model.key} model={model} onOpenModel={onOpenModel} />
+          <ModelCard key={model.key} model={model} onOpenModel={onOpenModel} showDb={showDb} />
         )
       )}
     </div>

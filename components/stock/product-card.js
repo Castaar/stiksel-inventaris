@@ -15,7 +15,7 @@ export function StatusTags({ product }) {
   );
 }
 
-export default function ProductCard({ product, onOpen, onQuick, busy }) {
+export default function ProductCard({ product, onOpen, onQuick, busy, showDb }) {
   const state = status(product);
 
   return (
@@ -28,6 +28,7 @@ export default function ProductCard({ product, onOpen, onQuick, busy }) {
       />
       <div>
         <div className={styles["card-group"]}>
+          {showDb && <span className={`${styles["db-tag"]} cap`}>{label(product.db)}</span>}
           <span className="cap">{label(product.collection)}</span>
           {product.merk && <span className="cap"> · {product.merk}</span>} <StatusTags product={product} />
         </div>

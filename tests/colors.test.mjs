@@ -30,3 +30,10 @@ test('family words', () => {
   assert.equal(familyForWord('rood'), 'rood');
   assert.equal(familyForWord('hoodie'), null);
 });
+
+test('supplier colour names get their own shade', () => {
+  assert.equal(colorSwatches('Green Bay')[0].hex, '#4f7a63');
+  assert.equal(colorFamily('dark heather blue'), 'blauw');
+  assert.equal(colorSwatches('camel black').length, 2);
+  assert.deepEqual(colorSwatches('onbekend'), []);
+});
