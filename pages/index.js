@@ -165,7 +165,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         category={data[kindDb].collections.includes(category) ? category : null}
         onCategory={(cat) => setQuery({ tab: kindDb, cat })}
         color={color}
-        onColor={(kleur) => setQuery({ tab: kindDb, cat: category, kleur })}
+        onColor={(kleur) => setQuery({ tab: kindDb, cat: category, kleur, maat: size })}
         size={size}
         onSize={(maat) => setQuery({ tab: kindDb, cat: category, kleur: color, maat })}
         sort={sort}

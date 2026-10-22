@@ -194,6 +194,7 @@ function ColorFilter({ products, color, onColor }) {
   if (colors.length < 2 && !color) return null;
   return (
     <div className={`chips ${styles["color-row"]}`} role="group" aria-label="Filter op kleur">
+      <span className={styles["filter-label"]}>Kleur</span>
       <button type="button" className="chip" aria-pressed={!color} onClick={() => onColor(null)}>
         Alle kleuren
       </button>
@@ -213,7 +214,8 @@ function SizeFilter({ products, size, onSize }) {
   if (sizes.length < 2 && !size) return null;
   return (
     <div className={`chips ${styles["size-row"]}`} role="group" aria-label="Filter op maat">
-      <button type="button" className="chip" aria-pressed={!size} onClick={() => onSize(null)}>
+      <span className={styles["filter-label"]}>Maat</span>
+      <button type="button" className="chip" data-all aria-pressed={!size} onClick={() => onSize(null)}>
         Alle maten
       </button>
       {sizes.map(([maat, count]) => (
@@ -236,6 +238,13 @@ export function KindView({ db, part, category, onCategory, color, onColor, size,
   const shown = size ? ofColor.filter((p) => (p.maat || "").trim() === size) : ofColor;
   const groups = category ? [category] : part.collections;
   const filtered = Boolean(color || size);
+  // The filter chips are folded away behind "Filteren"; active filters stay visible as chips with ×
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const active = [
+    category && { key: "cat", text: label(category), clear: () => onCategory(null) },
+    color && { key: "kleur", text: color, dot: color, clear: () => onColor(null) },
+    size && { key: "maat", text: size.toUpperCase(), clear: () => onSize(null) },
+  ].filter(Boolean);
 
   return (
     <section className={styles["block"]}>
@@ -243,6 +252,15 @@ export function KindView({ db, part, category, onCategory, color, onColor, size,
         title={label(db)}
         meta={`${groupModels(shown).length} modellen, ${nf.format(sum(shown, quantity))} stuks, ${eur.format(sum(shown, (p) => p.value))}`}
       >
+        <button
+          type="button"
+          className="btn small"
+          aria-expanded={filtersOpen}
+          aria-controls={`filters-${db}`}
+          onClick={() => setFiltersOpen(!filtersOpen)}
+        >
+          {filtersOpen ? "Filters sluiten" : `Filteren${active.length ? ` (${active.length})` : ""}`}
+        </button>
         <SortSelect sort={sort} onSort={onSort} />
         {emptyCount > 0 && (
           <button type="button" className="btn small" aria-pressed={showEmpty} onClick={() => setShowEmpty(!showEmpty)}>
@@ -252,21 +270,34 @@ export function KindView({ db, part, category, onCategory, color, onColor, size,
         <button type="button" className="btn small" onClick={onExport}>CSV</button>
         <button type="button" className="btn small" onClick={onManage}>Categorieën</button>
       </BlockHead>
-      {part.collections.length > 1 && (
-        <div className={`chips ${styles["chip-row"]}`} role="group" aria-label="Filter op categorie">
-          <button type="button" className="chip" aria-pressed={!category} onClick={() => onCategory(null)}>
-            Alle
-          </button>
-          {part.collections.map((name) => (
-            <button key={name} type="button" className="chip" aria-pressed={category === name} onClick={() => onCategory(name)}>
-              {label(name)}
+      {!filtersOpen && active.length > 0 && (
+        <div className={`chips ${styles["chip-row"]}`} aria-label="Actieve filters">
+          {active.map((filter) => (
+            <button key={filter.key} type="button" className="chip" aria-pressed="true" onClick={filter.clear} aria-label={`Filter ${filter.text} wissen`}>
+              {filter.dot && <ColorDot kleur={filter.dot} />}
+              {filter.text} ×
             </button>
           ))}
         </div>
       )}
-      <ColorFilter products={inCategory} color={color} onColor={onColor} />
-      {/* Sizes of the chosen colour, so only sizes that exist in that colour show */}
-      <SizeFilter products={ofColor} size={size} onSize={onSize} />
+      <div id={`filters-${db}`} className={styles["filters"]} hidden={!filtersOpen}>
+        {part.collections.length > 1 && (
+          <div className={`chips ${styles["chip-row"]}`} role="group" aria-label="Filter op categorie">
+            <span className={styles["filter-label"]}>Categorie</span>
+            <button type="button" className="chip" aria-pressed={!category} onClick={() => onCategory(null)}>
+              Alle
+            </button>
+            {part.collections.map((name) => (
+              <button key={name} type="button" className="chip" aria-pressed={category === name} onClick={() => onCategory(name)}>
+                {label(name)}
+              </button>
+            ))}
+          </div>
+        )}
+        <ColorFilter products={inCategory} color={color} onColor={onColor} />
+        {/* Sizes of the chosen colour, so only sizes that exist in that colour show */}
+        <SizeFilter products={ofColor} size={size} onSize={onSize} />
+      </div>
       {groups.map((name) => {
         const list = shown.filter((p) => p.collection === name);
         const models = sortModels(groupModels(list), sort);
