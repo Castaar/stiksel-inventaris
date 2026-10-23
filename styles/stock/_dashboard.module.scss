@@ -226,7 +226,7 @@
   font-weight: 700;
   display: flex;
   gap: 10px;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
 
   > span {
@@ -236,11 +236,10 @@
   }
 }
 
+// A small button like the ones in the block head
 .subhead-add {
   margin-left: auto;
-  font-size: 14px;
   font-weight: 400;
-  color: var(--accent-text);
 }
 
 // Product cards

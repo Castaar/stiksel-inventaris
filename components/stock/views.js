@@ -309,7 +309,7 @@ export function KindView({ db, part, category, onCategory, color, onColor, size,
               <span>
                 {models.length} modellen, {nf.format(sum(list, quantity))} stuks, {eur.format(sum(list, (p) => p.value))}
               </span>
-              <button type="button" className={`linkbtn ${styles["subhead-add"]}`} onClick={() => onAdd(db, name)}>
+              <button type="button" className={`btn small ${styles["subhead-add"]}`} onClick={() => onAdd(db, name)}>
                 + Product
               </button>
             </div>
