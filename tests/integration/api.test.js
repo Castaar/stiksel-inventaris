@@ -84,6 +84,45 @@ describe('products/add-many', () => {
   });
 });
 
+describe('products/merge', () => {
+  const merge = (ids) => api('products/merge', { body: { db: 'winkel', collection: 'hoodies', ids: ids.map(String) } });
+
+  test('adds the pieces to the first row and removes the others, with history', async () => {
+    const { insertedIds } = await hoodies().insertMany([
+      product({ stock: 2, merk: '', akp: null, leverdatum: '' }),
+      product({ stock: '3', merk: 'just hoods', akp: 12.5, leverdatum: '2026-01-31' }),
+      product({ stock: 0, lang_in_stock: true }),
+    ]);
+    const { status, data } = await merge(Object.values(insertedIds));
+    expect(status).toBe(200);
+    expect(data).toMatchObject({ stock: 5, merged: 2 });
+    expect(await hoodies().countDocuments()).toBe(1);
+    expect(await hoodies().findOne({})).toMatchObject({ _id: insertedIds[0], stock: 5, merk: 'just hoods', akp: 12.5, leverdatum: '2026-01-31', lang_in_stock: true });
+    const history = await client.db('stiksel_inventaris').collection('stock_history').find({}).toArray();
+    expect(history.map((h) => [h.source, h.delta]).sort()).toEqual([['samenvoegen', 3], ['verwijderd', -3]]);
+  });
+
+  test('refuses rows that are not the same product', async () => {
+    const other = await hoodies().insertMany([product({ maat: 's' }), product({ maat: 'm' })]);
+    expect((await merge(Object.values(other.insertedIds))).status).toBe(400);
+    const names = await hoodies().insertMany([product({ maat: 'l', modelnaam: 'stanley guider' }), product({ maat: 'l', modelnaam: 'stanley navigator' })]);
+    const refused = await merge(Object.values(names.insertedIds));
+    expect(refused.status).toBe(409);
+    expect(refused.data.error).toMatch(/modelnamen/);
+    const prices = await hoodies().insertMany([product({ maat: 'xl', akp: 10 }), product({ maat: 'xl', akp: 12 })]);
+    expect((await merge(Object.values(prices.insertedIds))).status).toBe(409);
+    expect(await hoodies().countDocuments()).toBe(6);
+  });
+
+  test('needs at least two existing rows', async () => {
+    const { insertedId } = await hoodies().insertOne(product());
+    expect((await merge([insertedId])).status).toBe(400);
+    expect((await merge([insertedId, '0123456789abcdef01234567'])).status).toBe(404);
+    expect((await merge([insertedId, insertedId])).status).toBe(400);
+    expect(await hoodies().countDocuments()).toBe(1);
+  });
+});
+
 describe('products without a refnr', () => {
   test('are known by their name', async () => {
     const ink = (kleur) => ({ db: 'winkel', collection: 'hoodies', refnr: '', modelnaam: 'STS XPD-2 Inks', kleur, stock: 2, akp: 70 });

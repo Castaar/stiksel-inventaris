@@ -321,3 +321,38 @@
 .grid-preset {
   text-transform: uppercase;
 }
+
+// Rows entered twice, with a button to merge them
+.dups {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+
+.dup-row {
+  padding: 10px 12px;
+
+  & + & {
+    border-top: 1px solid var(--line);
+  }
+
+  p {
+    margin: 6px 0;
+    font-size: 14px;
+  }
+}
+
+.dup-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.dup-part {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 6px;
+}

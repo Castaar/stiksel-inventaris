@@ -222,6 +222,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onClose={close}
         onOpen={(key) => setDrawer({ type: "product", key, from: drawer.key })}
         onAddVariant={() => addVariantsTo(first)}
+        onChanged={refresh}
       />
     );
   } else if (drawer?.type === "product" && drawerProduct) {
