@@ -13,6 +13,8 @@ import AppHeader from "../components/layout/app-header";
 import Drawer from "../components/stock/drawer";
 import ProductDrawer from "../components/stock/product-drawer";
 import ModelDrawer from "../components/stock/model-drawer";
+import RowsEditDrawer from "../components/stock/rows-edit-drawer";
+import SplitDrawer from "../components/stock/split-drawer";
 import EditDrawer from "../components/stock/edit-drawer";
 import NewDrawer from "../components/stock/new-drawer";
 import CategoriesDrawer from "../components/stock/categories-drawer";
@@ -212,6 +214,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
   // The drawer's product comes from the latest data, so it updates after every change
   const drawerProduct = drawer?.key ? byKey.get(drawer.key) : null;
   const drawerModel = drawer?.type === "model" ? models.get(drawer.key) : null;
+  const drawerRows = (drawer?.keys || []).map((key) => byKey.get(key)).filter(Boolean);
   let drawerContent = null;
   if (drawerModel) {
     const first = drawerModel.variants[0];
@@ -223,6 +226,8 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onOpen={(key) => setDrawer({ type: "product", key, from: drawer.key })}
         onAddVariant={() => addVariantsTo(first)}
         onChanged={refresh}
+        onEditRows={(rows) => setDrawer({ type: "rows-edit", keys: rows.map(productKey), from: drawer.key })}
+        onSplit={(rows) => setDrawer({ type: "split", keys: rows.map(productKey), from: drawer.key })}
       />
     );
   } else if (drawer?.type === "product" && drawerProduct) {
@@ -242,6 +247,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onOpen={open}
         onBack={drawer.from ? () => openModel(drawer.from) : models.get(modelKey(drawerProduct))?.variants.length > 1 ? () => openModel(modelKey(drawerProduct)) : undefined}
         onAddVariant={() => addVariantsTo(drawerProduct)}
+        onSplit={() => setDrawer({ type: "split", keys: [drawer.key], from: modelKey(drawerProduct) })}
         onEdit={() => setDrawer({ type: "edit", key: drawer.key, from: drawer.from })}
       />
     );
@@ -250,15 +256,43 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
       <EditDrawer
         key={`${drawer.key}:${drawerProduct.updated_at}`}
         product={drawerProduct}
+        collections={data[drawerProduct.db].collections}
         suggestions={suggestionsFor(data[drawerProduct.db].products)}
         onClose={() => setDrawer({ type: "product", key: drawer.key, from: drawer.from })}
-        onSaved={async () => {
+        onSaved={async (collection) => {
           await refresh();
-          setDrawer({ type: "product", key: drawer.key, from: drawer.from });
+          // A move or another refnr can put it under another model: open the product itself
+          setDrawer({ type: "product", key: `${drawerProduct.db}:${collection}:${drawerProduct._id}` });
         }}
         onDeleted={async () => {
           setDrawer(null);
           await refresh();
+        }}
+      />
+    );
+  } else if (drawer?.type === "rows-edit" && drawerRows.length) {
+    drawerContent = (
+      <RowsEditDrawer
+        rows={drawerRows}
+        collections={data[drawerRows[0].db].collections}
+        suggestions={suggestionsFor(data[drawerRows[0].db].products)}
+        onClose={() => openModel(drawer.from)}
+        onSaved={async (key) => {
+          await refresh();
+          openModel(key);
+        }}
+      />
+    );
+  } else if (drawer?.type === "split" && drawerRows.length) {
+    drawerContent = (
+      <SplitDrawer
+        rows={drawerRows}
+        variants={models.get(modelKey(drawerRows[0]))?.variants || drawerRows}
+        suggestions={suggestionsFor(data[drawerRows[0].db].products)}
+        onClose={() => openModel(drawer.from)}
+        onDone={async () => {
+          await refresh();
+          openModel(drawer.from);
         }}
       />
     );
@@ -359,7 +393,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
           </span>
         </footer>
       </main>
-      <Drawer open={Boolean(drawerContent)} onClose={close} contentKey={drawer ? `${drawer.type}:${drawer.key}` : ""}>
+      <Drawer open={Boolean(drawerContent)} onClose={close} contentKey={drawer ? `${drawer.type}:${drawer.key || drawer.keys?.join()}` : ""}>
         {drawerContent}
       </Drawer>
     </>

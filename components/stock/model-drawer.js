@@ -12,7 +12,7 @@ import { ModelTags, sizeRange } from "./model-card";
 import styles from "../../styles/stock/_drawer.module.scss";
 
 // A model with all its variants: the colour x size table, click a number to change that variant
-export default function ModelDrawer({ model, onClose, onOpen, onAddVariant, onChanged }) {
+export default function ModelDrawer({ model, onClose, onOpen, onAddVariant, onChanged, onEditRows, onSplit }) {
   const [merging, setMerging] = useState(false);
   const groups = duplicateGroups(model.variants);
   const mergeable = groups.flatMap((group) => group.parts.filter((part) => part.mergeable));
@@ -75,18 +75,28 @@ export default function ModelDrawer({ model, onClose, onOpen, onAddVariant, onCh
                     <span className={styles["lbl"]}>{nf.format(group.stock)} stuks</span>
                   </div>
                   {group.otherNames && (
-                    <p className={styles["warn"]}>Verschillende modelnamen onder hetzelfde refnr: klik op een naam en pas het refnr aan.</p>
+                    <p className={styles["warn"]}>Verschillende modelnamen onder hetzelfde refnr: pas per naam het refnr en de categorie aan via Bewerken.</p>
                   )}
                   {group.parts.map((part) => (
                     <div key={part.name} className={styles["dup-part"]}>
                       <button type="button" className="chip" onClick={() => onOpen(productKey(part.rows[0]))}>
                         {part.name || model.title} {part.rows.length > 1 ? `× ${part.rows.length} rijen` : ""} ({nf.format(part.stock)})
                       </button>
-                      {part.mergeable && (
-                        <button type="button" className={`btn small ${styles["push"]}`} disabled={merging} onClick={() => merge([part])}>
-                          Samenvoegen
+                      <span className={styles["dup-actions"]}>
+                        <button type="button" className="btn small" onClick={() => onEditRows(part.rows)}>
+                          Bewerken
                         </button>
-                      )}
+                        {part.stock > 0 && !part.problem && (
+                          <button type="button" className="btn small" onClick={() => onSplit(part.rows)}>
+                            Verdelen
+                          </button>
+                        )}
+                        {part.mergeable && (
+                          <button type="button" className="btn small" disabled={merging} onClick={() => merge([part])}>
+                            Samenvoegen
+                          </button>
+                        )}
+                      </span>
                       {part.problem && <span className={styles["warn"]}>{part.problem}</span>}
                     </div>
                   ))}
@@ -106,11 +116,14 @@ export default function ModelDrawer({ model, onClose, onOpen, onAddVariant, onCh
         <h3>Kleuren en maten</h3>
         <p className="hint">Klik op een aantal om af te boeken, aan te vullen of te bewerken.</p>
         <VariantMatrix variants={model.variants} onOpen={onOpen} />
-        <p className="hint">
+        <div className={styles["mut"]}>
           <button type="button" className="btn small" onClick={onAddVariant}>
             + Kleuren of maten toevoegen
           </button>
-        </p>
+          <button type="button" className="btn small" onClick={() => onEditRows(model.variants)}>
+            Heel model bewerken
+          </button>
+        </div>
       </DrawerBody>
     </>
   );

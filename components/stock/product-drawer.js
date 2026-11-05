@@ -33,7 +33,7 @@ function useProductHistory(product) {
 }
 
 // `variants` are all products with the same refnr in this database (this one included)
-export default function ProductDrawer({ product, productKey, variants, now, onClose, onEdit, onChange, onOpen, onBack, onAddVariant, busy }) {
+export default function ProductDrawer({ product, productKey, variants, now, onClose, onEdit, onChange, onOpen, onBack, onAddVariant, onSplit, busy }) {
   const [amount, setAmount] = useState("");
   const history = useProductHistory(product);
 
@@ -126,11 +126,16 @@ export default function ProductDrawer({ product, productKey, variants, now, onCl
           </>
         )}
 
-        <p className="hint">
+        <div className={styles["mut"]}>
           <button type="button" className="btn small" onClick={onAddVariant}>
             + Kleuren of maten toevoegen
           </button>
-        </p>
+          {quantity(product) > 0 && (
+            <button type="button" className="btn small" onClick={onSplit}>
+              Verdelen over kleuren en maten
+            </button>
+          )}
+        </div>
 
         <h3>Gegevens</h3>
         <dl className={styles["facts"]}>

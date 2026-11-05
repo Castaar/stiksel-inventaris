@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { PRODUCT_FIELDS } from "../../lib/product";
 import { label, productTitle } from "../../lib/stock-view";
-import { deleteProduct, updateProduct } from "../../lib/stock-actions";
+import { deleteProduct, updateProduct, updateRows } from "../../lib/stock-actions";
 import { DrawerBody, DrawerFoot, DrawerHead } from "./drawer";
 import ProductFields from "./product-fields";
 
-export default function EditDrawer({ product, suggestions, onClose, onSaved, onDeleted }) {
+export default function EditDrawer({ product, collections, suggestions, onClose, onSaved, onDeleted }) {
+  const categoryId = useId();
+  const [collection, setCollection] = useState(product.collection);
   const [isSaving, setIsSaving] = useState(false);
   const [values, setValues] = useState(() =>
     Object.fromEntries(PRODUCT_FIELDS.map(({ key }) => [key, product[key] ?? (key === "lang_in_stock" ? false : "")]))
@@ -22,8 +24,9 @@ export default function EditDrawer({ product, suggestions, onClose, onSaved, onD
         Object.entries(values).filter(([key, value]) => String(value ?? "") !== String(product[key] ?? (key === "lang_in_stock" ? false : "")))
       );
       if (Object.keys(changed).length) await updateProduct(product, changed);
+      if (collection !== product.collection) await updateRows([product], {}, collection);
       toast.success("De gegevens zijn bewaard");
-      await onSaved();
+      await onSaved(collection);
     } catch (error) {
       toast.error(`Bewaren mislukt: ${error.message}`);
       setIsSaving(false);
@@ -51,6 +54,14 @@ export default function EditDrawer({ product, suggestions, onClose, onSaved, onD
         onClose={onClose}
       />
       <DrawerBody as="form" id="edit-form" onSubmit={save} autoComplete="off">
+        <div className="field">
+          <label htmlFor={categoryId}>Categorie</label>
+          <select id={categoryId} className="input" value={collection} onChange={(e) => setCollection(e.target.value)}>
+            {collections.map((name) => (
+              <option key={name} value={name}>{label(name)}</option>
+            ))}
+          </select>
+        </div>
         <ProductFields values={values} onChange={(key, value) => setValues((prev) => ({ ...prev, [key]: value }))} suggestions={suggestions} />
       </DrawerBody>
       <DrawerFoot

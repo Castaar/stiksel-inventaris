@@ -123,6 +123,80 @@ describe('products/merge', () => {
   });
 });
 
+describe('products/update-many', () => {
+  const update = (ids, fields, target) => api('products/update-many', { body: { db: 'winkel', collection: 'hoodies', ids: ids.map(String), fields, target_collection: target } });
+
+  test('changes only the sent fields on all rows; colour, size and stock stay', async () => {
+    const { insertedIds } = await hoodies().insertMany([product({ maat: 's', stock: 1, merk: 'a' }), product({ maat: 'm', stock: 2, merk: 'b' })]);
+    const { status } = await update(Object.values(insertedIds), { refnr: 'STSU177', akp: '9,5', kleur: 'hack', stock: 99 });
+    expect(status).toBe(200);
+    const docs = await hoodies().find({}).sort({ maat: -1 }).toArray();
+    expect(docs.map((d) => [d.refnr, d.akp, d.kleur, d.maat, d.stock, d.merk])).toEqual([
+      ['stsu177', 9.5, 'navy', 's', 1, 'a'],
+      ['stsu177', 9.5, 'navy', 'm', 2, 'b'],
+    ]);
+  });
+
+  test('moves rows to another category with their history', async () => {
+    await winkel().createCollection('hemden');
+    const { insertedId } = await hoodies().insertOne(product({ stock: 3 }));
+    await api('products/adjust', { body: { db: 'winkel', collection: 'hoodies', _id: insertedId.toString(), delta: -1 } });
+    expect((await update([insertedId], {}, 'hemden')).status).toBe(200);
+    expect(await hoodies().countDocuments()).toBe(0);
+    expect(await winkel().collection('hemden').findOne({ _id: insertedId })).toMatchObject({ stock: 2 });
+    const { data } = await api(`history?db=winkel&collection=hemden&id=${insertedId}`, { method: 'GET' });
+    expect(data.entries).toHaveLength(1);
+    await winkel().collection('hemden').drop();
+  });
+
+  test('refuses an unknown category, missing rows or no name left', async () => {
+    const { insertedId } = await hoodies().insertOne(product());
+    expect((await update([insertedId], {}, 'bestaatniet')).status).toBe(404);
+    expect((await update(['0123456789abcdef01234567'], { merk: 'x' })).status).toBe(404);
+    expect((await update([insertedId], { refnr: '', modelnaam: '' })).status).toBe(400);
+    expect(await hoodies().findOne({ _id: insertedId })).toMatchObject({ refnr: 'jh001' });
+  });
+});
+
+describe('products/split', () => {
+  const split = (ids, variants) => api('products/split', { body: { db: 'winkel', collection: 'hoodies', ids: ids.map(String), variants } });
+  const unknown = (fields = {}) => product({ kleur: 'onbekend', maat: '', stock: 1, ...fields });
+
+  test('divides rows over colours and sizes, the rest stays, with history', async () => {
+    const { insertedIds } = await hoodies().insertMany([unknown({ stock: 3 }), unknown({ stock: 2 })]);
+    await hoodies().insertOne(product({ kleur: 'navy', maat: 'm', stock: 1 }));
+    const { status, data } = await split(Object.values(insertedIds), [{ kleur: 'navy', maat: 'm', stock: 2 }, { kleur: 'zwart', maat: 's', stock: 1 }]);
+    expect(status).toBe(200);
+    expect(data).toEqual({ divided: 3, remaining: 2 });
+    expect((await hoodies().findOne({ kleur: 'navy' })).stock).toBe(3);
+    expect(await hoodies().findOne({ kleur: 'zwart' })).toMatchObject({ refnr: 'jh001', modelnaam: 'college hoodie', akp: 12.5, stock: 1 });
+    expect((await hoodies().findOne({ kleur: 'onbekend' })).stock).toBe(2);
+    expect(await hoodies().countDocuments()).toBe(3);
+    const total = (await hoodies().find({}).toArray()).reduce((n, d) => n + d.stock, 0);
+    expect(total).toBe(6);
+    const history = await client.db('stiksel_inventaris').collection('stock_history').find({ source: 'verdelen' }).toArray();
+    expect(history.reduce((n, h) => n + h.delta, 0)).toBe(0);
+  });
+
+  test('an empty source row disappears', async () => {
+    const { insertedId } = await hoodies().insertOne(unknown({ stock: 2 }));
+    await split([insertedId], [{ kleur: 'navy', maat: 's', stock: 2 }]);
+    expect(await hoodies().findOne({ _id: insertedId })).toBeNull();
+    expect((await hoodies().findOne({})).stock).toBe(2);
+  });
+
+  test('refuses too many pieces, the same variant or other products, and writes nothing', async () => {
+    const { insertedId } = await hoodies().insertOne(unknown({ stock: 2 }));
+    expect((await split([insertedId], [{ kleur: 'navy', maat: 's', stock: 3 }])).status).toBe(400);
+    expect((await split([insertedId], [{ kleur: 'ONBEKEND', maat: '', stock: 1 }])).status).toBe(400);
+    expect((await split([insertedId], [{ kleur: 'navy', maat: 's', stock: 0 }])).status).toBe(400);
+    const other = await hoodies().insertOne(unknown({ modelnaam: 'slammer' }));
+    expect((await split([insertedId, other.insertedId], [{ kleur: 'navy', maat: 's', stock: 1 }])).status).toBe(409);
+    expect(await hoodies().countDocuments()).toBe(2);
+    expect((await hoodies().findOne({ _id: insertedId })).stock).toBe(2);
+  });
+});
+
 describe('products without a refnr', () => {
   test('are known by their name', async () => {
     const ink = (kleur) => ({ db: 'winkel', collection: 'hoodies', refnr: '', modelnaam: 'STS XPD-2 Inks', kleur, stock: 2, akp: 70 });
