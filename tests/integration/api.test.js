@@ -51,6 +51,39 @@ describe('products/add', () => {
   });
 });
 
+describe('products/add-many', () => {
+  const body = (variants, fields = {}) => ({ db: 'winkel', collection: 'hoodies', refnr: 'JH001', modelnaam: 'College Hoodie', gender: 'unisex', akp: '12,5', variants, ...fields });
+
+  test('creates new variants and adds to existing ones, with history', async () => {
+    const { insertedId } = await hoodies().insertOne(product({ kleur: 'navy', maat: 'm', stock: '3' }));
+    const { status, data } = await api('products/add-many', {
+      body: body([{ kleur: 'Navy', maat: 'M', stock: 2 }, { kleur: 'navy', maat: 'l', stock: '4' }, { kleur: 'zwart', maat: 'm', stock: 1 }]),
+    });
+    expect(status).toBe(200);
+    expect(data).toMatchObject({ created: 2, added: 1 });
+    expect(await hoodies().countDocuments()).toBe(3);
+    expect((await hoodies().findOne({ _id: insertedId })).stock).toBe(5);
+    expect(await hoodies().findOne({ kleur: 'navy', maat: 'l' })).toMatchObject({ refnr: 'jh001', modelnaam: 'college hoodie', akp: 12.5, stock: 4, gender: 'unisex' });
+    const history = await client.db('stiksel_inventaris').collection('stock_history').find({}).toArray();
+    expect(history.map((h) => h.source).sort()).toEqual(['aanvullen', 'nieuw', 'nieuw']);
+  });
+
+  test('the same variant twice in one request is added up', async () => {
+    const { data } = await api('products/add-many', { body: body([{ kleur: 'navy', maat: 's', stock: 1 }, { kleur: 'NAVY', maat: 'S', stock: 2 }]) });
+    expect(data).toMatchObject({ created: 1, added: 1 });
+    expect((await hoodies().findOne({})).stock).toBe(3);
+  });
+
+  test('writes nothing when one variant is wrong', async () => {
+    const wrong = await api('products/add-many', { body: body([{ kleur: 'navy', maat: 's', stock: 1 }, { kleur: 'navy', maat: 'm', stock: 'veel' }]) });
+    expect(wrong.status).toBe(400);
+    expect((await api('products/add-many', { body: body([{ kleur: 'navy', maat: 's', stock: 0 }]) })).status).toBe(400);
+    expect((await api('products/add-many', { body: body([]) })).status).toBe(400);
+    expect((await api('products/add-many', { body: body([{ stock: 1 }], { refnr: '', modelnaam: '' }) })).status).toBe(400);
+    expect(await hoodies().countDocuments()).toBe(0);
+  });
+});
+
 describe('products without a refnr', () => {
   test('are known by their name', async () => {
     const ink = (kleur) => ({ db: 'winkel', collection: 'hoodies', refnr: '', modelnaam: 'STS XPD-2 Inks', kleur, stock: 2, akp: 70 });

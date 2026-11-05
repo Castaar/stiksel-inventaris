@@ -9,7 +9,7 @@ let server;
 let baseUrl;
 
 const ROUTES = [
-  'products/add', 'products/adjust', 'products/update', 'products/delete',
+  'products/add', 'products/add-many', 'products/adjust', 'products/update', 'products/delete',
   'export', 'import', 'collections', 'settings', 'health', 'login', 'history', 'ask',
 ];
 

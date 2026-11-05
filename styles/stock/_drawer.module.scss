@@ -299,3 +299,25 @@
   margin: -6px 0 14px;
   font-size: 14px;
 }
+
+// Pieces per colour and size in the new product form
+.grid-input {
+  width: 58px;
+  padding: 5px 6px;
+  text-align: center;
+}
+
+.grid-now {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.grid-presets {
+  margin: -4px 0 12px;
+}
+
+.grid-preset {
+  text-transform: uppercase;
+}

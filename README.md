@@ -10,7 +10,7 @@ Elke database op de cluster is een inventaris (een tab), elke collectie een cate
 - **Per database**: één kaart per model (refnr) met zijn kleuren en maten; filter op categorie, kleur en maat; sorteren; tegels of rijen. Een model openen toont de tabel kleuren × maten, een aantal aanklikken om af te boeken of aan te vullen.
 - **Bijna op** per inventaris in te stellen (bij Categorieën), standaard uit. **Nieuwe inventaris** (bv. DTF-printer) via het menu.
 - **Productpaneel**: afboeken of aanvullen met een aantal, alle kleuren × maten van hetzelfde refnr in één tabel, gegevens en historiek.
-- **Nieuw product**: een bekend refnr vult model, merk, gender en AKP in; meerdere maten tegelijk met `S, M, L`. Een variant die al bestaat wordt geweigerd (geen dubbels meer).
+- **Nieuw product**: één formulier per model: kies kleuren en maten en vul per vakje de stuks in. Een bekend refnr vult model, merk, gender, AKP, kleuren en maten in. Een variant die al bestaat wordt aangevuld (geen dubbels meer).
 - **Categorieën** aanmaken, hernoemen, verwijderen (alleen leeg).
 - **CSV export** (alles, een database of een categorie) en **CSV import** met controle vooraf. Komma of puntkomma, met of zonder `id`/`versie` uit een export. Rijen die na de export in de app gewijzigd zijn, worden overgeslagen. Voor elke import wordt een back-up bewaard (laatste 10).
 - **Historiek** van elke stockwijziging en de meest verbruikte producten.

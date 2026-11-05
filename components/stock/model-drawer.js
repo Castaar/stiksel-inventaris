@@ -43,7 +43,7 @@ export default function ModelDrawer({ model, onClose, onOpen, onAddVariant }) {
         <VariantMatrix variants={model.variants} onOpen={onOpen} />
         <p className="hint">
           <button type="button" className="btn small" onClick={onAddVariant}>
-            + Kleur of maat toevoegen
+            + Kleuren of maten toevoegen
           </button>
         </p>
       </DrawerBody>

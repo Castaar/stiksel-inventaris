@@ -124,6 +124,20 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
   };
 
   const addFor = (db, collection) => setDrawer({ type: "new", db, collection });
+  // More colours, sizes or pieces of a model that exists: the form starts with its details
+  const addVariantsTo = (product) =>
+    setDrawer({
+      type: "new",
+      db: product.db,
+      collection: product.collection,
+      values: {
+        refnr: product.refnr || "",
+        modelnaam: product.modelnaam || "",
+        merk: product.merk || "",
+        gender: product.gender || "",
+        akp: product.akp ?? "",
+      },
+    });
 
   const cardProps = { onOpen: open, onOpenModel: openModel, onQuick: onQuantity, busy, layout };
   const q = search.trim();
@@ -207,14 +221,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         model={drawerModel}
         onClose={close}
         onOpen={(key) => setDrawer({ type: "product", key, from: drawer.key })}
-        onAddVariant={() =>
-          setDrawer({
-            type: "new",
-            db: first.db,
-            collection: first.collection,
-            values: { refnr: first.refnr || "", modelnaam: first.modelnaam || "", merk: first.merk || "", gender: first.gender || "", akp: first.akp ?? "" },
-          })
-        }
+        onAddVariant={() => addVariantsTo(first)}
       />
     );
   } else if (drawer?.type === "product" && drawerProduct) {
@@ -233,6 +240,7 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         onChange={onQuantity}
         onOpen={open}
         onBack={drawer.from ? () => openModel(drawer.from) : models.get(modelKey(drawerProduct))?.variants.length > 1 ? () => openModel(modelKey(drawerProduct)) : undefined}
+        onAddVariant={() => addVariantsTo(drawerProduct)}
         onEdit={() => setDrawer({ type: "edit", key: drawer.key, from: drawer.from })}
       />
     );
@@ -262,9 +270,9 @@ export default function Dashboard({ data, now, error, initialLayout, aiEnabled, 
         initialCollection={data[db].collections.includes(drawer.collection) ? drawer.collection : ""}
         initialValues={drawer.values}
         onClose={close}
-        onCreated={async (createdDb, collection, id) => {
+        onCreated={async (createdDb, collection, id, createdModel) => {
           await refresh();
-          setDrawer(id ? { type: "product", key: `${createdDb}:${collection}:${id}` } : null);
+          setDrawer(id ? { type: "product", key: `${createdDb}:${collection}:${id}` } : { type: "model", key: createdModel });
         }}
       />
     );
